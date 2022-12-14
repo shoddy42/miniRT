@@ -6,7 +6,7 @@
 #    By: wkonings <wkonings@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2019/10/29 16:21:56 by wkonings      #+#    #+#                  #
-#    Updated: 2022/12/14 19:45:14 by wkonings      ########   odam.nl          #
+#    Updated: 2022/12/14 20:15:12 by wkonings      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -48,7 +48,7 @@ INC			:= -I include
 # ----------------------------------------- #
 
 #this cant be fully right?
-HEADER_FILES:= 
+HEADER_FILES:=	miniRT.h
 HEADERS		:=	$(addprefix $(INCLUDE_DIR)/, $(HEADER_FILES))
 
 MAIN_FILES	:= main keyhooks

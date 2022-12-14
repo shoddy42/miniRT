@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:26:03 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/14 19:52:22 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/14 20:14:38 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,15 @@ typedef enum e_vecnum
 	W
 }	t_vecnum;
 
+typedef enum e_vec_colour
+{
+	R,
+	G,
+	B,
+	A
+}	t_vec_colour;
+
+
 typedef struct s_vector
 {
 	t_vec		vec;
@@ -44,6 +53,13 @@ typedef enum e_object_type
 	SPHERE,
 	CYLINDER,
 }	t_obj_type;
+
+typedef struct s_sphere
+{
+	t_vec	pos;
+	float	diameter;
+	t_vec	colour;
+}	t_sphere;
 
 typedef struct s_object
 {
