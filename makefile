@@ -6,7 +6,7 @@
 #    By: wkonings <wkonings@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2019/10/29 16:21:56 by wkonings      #+#    #+#                  #
-#    Updated: 2022/12/14 20:15:12 by wkonings      ########   odam.nl          #
+#    Updated: 2022/12/15 14:49:25 by wkonings      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -53,7 +53,7 @@ HEADERS		:=	$(addprefix $(INCLUDE_DIR)/, $(HEADER_FILES))
 
 MAIN_FILES	:= main keyhooks
 
-PARSER_FILES:= parser parse_objects
+PARSER_FILES:= parser parse_objects parse_utils
 
 FILES	:=	$(MAIN_FILES:%=%.c) \
 			$(addprefix $(S_PARSER)/, $(PARSER_FILES:%=%.c)) \
@@ -136,6 +136,8 @@ tooclean: fclean
 	/bin/rm -rf $(LIBMLX)
 
 re: fclean all
+
+#todo: make a git pull: which pulls from libft, mlx and minirt
 
 tooreal: tooclean re
 
