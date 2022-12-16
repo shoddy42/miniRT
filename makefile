@@ -6,7 +6,7 @@
 #    By: wkonings <wkonings@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2019/10/29 16:21:56 by wkonings      #+#    #+#                  #
-#    Updated: 2022/12/15 14:49:25 by wkonings      ########   odam.nl          #
+#    Updated: 2022/12/16 22:00:45 by root          ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,13 +15,14 @@
 # ----------------------------------------- #
 
 NAME 	:= miniRT
-FLAGS 	:= #-Wall -Wextra -Werror #//todo: RENABLE FLAGS WHEN HANDING IN FOR THE LOVE OF GOD
+FLAGS 	:= -pthread -mavx #-g -fsanitize=address  #-Wall -Wextra -Werror #//todo: RENABLE FLAGS WHEN HANDING IN FOR THE LOVE OF GOD
 CFLAGS	:= -w -Wunreachable-code -Ofast
 DEBUG 	:= #-g #-fsanitize=address
 LIBS	:=	libft mlx
 LIBMLX	:= mlx
 LIBFT	:= libft
 MAKEFILE:= makefile
+CC		:= clang
 
 # ---------------------------------------- #
 # --------------- DIRECTORIES ------------ #d
@@ -51,7 +52,7 @@ INC			:= -I include
 HEADER_FILES:=	miniRT.h
 HEADERS		:=	$(addprefix $(INCLUDE_DIR)/, $(HEADER_FILES))
 
-MAIN_FILES	:= main keyhooks
+MAIN_FILES	:= main keyhooks vectorlib
 
 PARSER_FILES:= parser parse_objects parse_utils
 
@@ -97,7 +98,7 @@ $(NAME): $(OBJS) $(HEADERS) $(MAKEFILE)
 	@make all -C $(LIB_DIR)
 	@make -C $(LIBMLX)
 	@printf "$(BLUE)Compiling $(YELLOW)$(NAME).\n$(END)"
-	@$(CC) $(FLAGS) $(DEBUG) $(SRCS) -o $(NAME) -I include $(INCLUDES)
+	@$(CC) -ldl -lglfw -lm $(FLAGS) $(DEBUG) $(SRCS) -o $(NAME) -I include -I mlx/include $(INCLUDES)
 	@printf "$(YELLOW)miniRT compiled!\n$(END)"
 
 all: $(BANNER) $(NAME)

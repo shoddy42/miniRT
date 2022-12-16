@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/15 14:49:40 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/15 16:23:31 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/16 22:02:47 by root          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,20 +15,20 @@
 char	*set_pos(char *line, t_obj *obj)
 {
 	obj->pos[X] = ft_atod(line);
-	line = ft_strchr(line, ',') + 1;
-	if (!line)
-		rt_error("No Y in line!\n");
-	obj->pos[Y] = ft_atod(line);
-	line = ft_strchr(line, ',') + 1;
-	if (!line)
-		rt_error("No Z in line!\n");
-	obj->pos[Z] = ft_atod(line);
-	if (*line == '-' || *line == '+')
-		line++;
-	while (*line && (ft_isdigit(*line) || *line == '.'))
-		line++;
-	while (*line && ft_isspace(*line))
-		line++;
+	// line = ft_strchr(line, ',') + 1;
+	// if (!line)
+	// 	rt_error("No Y in line!\n");
+	// obj->pos[Y] = ft_atod(line);
+	// line = ft_strchr(line, ',') + 1;
+	// if (!line)
+	// 	rt_error("No Z in line!\n");
+	// obj->pos[Z] = ft_atod(line);
+	// if (*line == '-' || *line == '+')
+	// 	line++;
+	// while (*line && (ft_isdigit(*line) || *line == '.'))
+	// 	line++;
+	// while (*line && ft_isspace(*line))
+	// 	line++;
 	return (line);
 }
 

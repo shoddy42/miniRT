@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:26:03 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/15 18:19:01 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/16 22:08:03 by root          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 # define WINDOW_WIDTH 1000
 # define WINDOW_HEIGHT 1000
 # define FOV 90
-# include "mlx/include/MLX42/MLX42.h"
+# include "../mlx/include/MLX42/MLX42.h"
 # include "../libft/include/libft.h"
 # include <stdlib.h>
 # include <stdio.h>
@@ -58,7 +58,6 @@ typedef enum e_vec_colour
 typedef struct s_vector
 {
 	t_vec		vec;
-	uint32_t	colour;
 }	t_vector;
 
 typedef enum e_object_type
@@ -146,5 +145,12 @@ char	*set_rgb(char *line, t_obj *obj);
 char	*set_pos(char *line, t_obj *obj);
 char	*set_orientation(char *line, t_obj *obj);
 
+
+// vector lib
+double		vec_length(t_vec vec);
+double		vec_length_squared(t_vec vec);
+double		sqr(double x);
+double		dot(t_vec a, t_vec b);
+t_vec		cross(t_vec a, t_vec b);
 
 #endif

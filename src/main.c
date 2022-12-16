@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:13:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/15 18:35:45 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/16 21:59:08 by root          ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@ void	init_struct(t_raytracer *rt, char **av)
 	char *title;
 
 	open_scene(av, rt);
-	title = ft_strjoin("miniRT - ", av[1]);
-	rt->mlx = mlx_init(WINDOW_WIDTH, WINDOW_HEIGHT, title, true);
+	// title = ft_strjoin("miniRT - ", av[1]);
+	rt->mlx = mlx_init(WINDOW_WIDTH, WINDOW_HEIGHT, "title", true);
 	if (!rt->mlx)
 		exit(1);
 	rt->img = mlx_new_image(rt->mlx, rt->mlx->width, rt->mlx->height);
@@ -33,24 +33,27 @@ void	init_struct(t_raytracer *rt, char **av)
 	mlx_image_to_window(rt->mlx, rt->img, 0, 0);
 	mlx_key_hook(rt->mlx, &keyhook, rt);
 
-	free (title);
+	// free (title);
 }
 
 uint32_t	vec_to_colour(const t_vec *vec)
 {
 	uint32_t colour;
+	double	col;
 
 	colour = 0;
-	colour += vec[X]
-	
+	col = 0;
+	// col = vec[X];
+	// printf ("huh: [%f]\n", vec[X]);
+	return (colour);
 }
 
-t_vec	ray_colour(const t_ray *ray)
-{
-	t_vec	unit_direction = ray->direction;
-	double	t = 0.5 * (unit_direction[Y] + 1.0);
-	return (((1.0 - t) * (t_vec){1.0, 1.0, 1.0}) + (t * (t_vec){0.5, 0.7, 1.0});
-}
+// t_vec	ray_colour(const t_ray *ray)
+// {
+// 	t_vec	unit_direction = ray->direction;
+// 	double	t = 0.5 * (unit_direction[Y] + 1.0);
+// 	return (((1.0 - t) * (t_vec){1.0, 1.0, 1.0}) + (t * (t_vec){0.5, 0.7, 1.0}));
+// }
 
 uint32_t	find_obj(t_raytracer *rt, t_ray *ray)
 {
@@ -80,9 +83,9 @@ uint32_t	find_obj(t_raytracer *rt, t_ray *ray)
 
 uint32_t	yeet_ray(t_raytracer *rt, t_ray *ray)
 {
-	// ray->direction = rt->camera.direction;
-	// ray->origin = rt->camera.pos;
-	// ray->pos = ray->origin;
+	ray->direction = rt->camera.direction;
+	ray->origin = rt->camera.pos;
+	ray->pos = ray->origin;
 
 	// printf ("yeeting rays!\n");
 	while (ray->pos[X] < 100 && ray->pos[Y] < 100 && ray->pos[Z] < 100)
@@ -109,20 +112,25 @@ void	cast_rays(t_raytracer *rt)
 	// low_left_corner = 1;
 	while (++y < WINDOW_HEIGHT)
 	{
-		printf ("Lines remaining [%i]\n", WINDOW_HEIGHT - y);
+		// printf ("Lines remaining [%i]\n", WINDOW_HEIGHT - y);
 		x = -1;
 		while (++x <= WINDOW_WIDTH)
 		{
-			u = (double)x / (double)WINDOW_WIDTH -1;
-			v = (double)y / (double)WINDOW_HEIGHT -1;
-			ray.origin = rt->camera.pos;
-			ray.direction = rt->camera.low_left_corner + (u * rt->camera.horizontal) + (v * rt->camera.vertical) - rt->camera.pos;
-			mlx_put_pixel(rt->img, x, y, ray_colour(&ray));
+			// u = (double)x / (double)WINDOW_WIDTH -1;
+			// v = (double)y / (double)WINDOW_HEIGHT -1;
+			// ray.origin = rt->camera.pos;
+			// ray.direction = rt->camera.low_left_corner + (u * rt->camera.horizontal) + (v * rt->camera.vertical) - rt->camera.pos;
+			// col = 0xFFFFFFFF;
+
+			// if (x >= 200 && x <= 400)
+			// 	col = 0xAAAAAAAA;
+			// col = ray_colour(&ray);
+			col = yeet_ray(rt, &ray);
+			mlx_put_pixel(rt->img, x, y, col);
 		}
 	}
 
 }
-
 
 int	main(int ac, char **av)
 {
