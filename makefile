@@ -6,7 +6,7 @@
 #    By: wkonings <wkonings@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2019/10/29 16:21:56 by wkonings      #+#    #+#                  #
-#    Updated: 2022/12/16 22:00:45 by root          ########   odam.nl          #
+#    Updated: 2022/12/20 00:24:21 by wkonings      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,7 +52,7 @@ INC			:= -I include
 HEADER_FILES:=	miniRT.h
 HEADERS		:=	$(addprefix $(INCLUDE_DIR)/, $(HEADER_FILES))
 
-MAIN_FILES	:= main keyhooks vectorlib
+MAIN_FILES	:= main keyhooks vectorlib rays intersections
 
 PARSER_FILES:= parser parse_objects parse_utils
 

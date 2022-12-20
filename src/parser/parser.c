@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 19:14:07 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/16 22:08:18 by root          ########   odam.nl         */
+/*   Updated: 2022/12/20 00:26:57 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,12 +55,12 @@ bool	open_scene(char **av, t_raytracer *rt)
 		// printf ("?: %s\n", line);
 		if (ft_strncmp("sp ", line, 3) == 0)
 			parse_sphere(line + 3, rt, rt->obj_idx++);
-		// else if (ft_strncmp("pl ", line, 3) == 0)
-		// 	parse_plane(line + 3, rt, rt->obj_idx++);
-		// else if (ft_strncmp("cy ", line, 3) == 0)
-		// 	parse_cylinder(line + 3, rt, rt->obj_idx++);
-		// else if (ft_strncmp("C ", line, 2) == 0)
-		// 	parse_camera(line + 2, rt, rt->obj_idx++);
+		else if (ft_strncmp("pl ", line, 3) == 0)
+			parse_plane(line + 3, rt, rt->obj_idx++);
+		else if (ft_strncmp("cy ", line, 3) == 0)
+			parse_cylinder(line + 3, rt, rt->obj_idx++);
+		else if (ft_strncmp("C ", line, 2) == 0)
+			parse_camera(line + 2, rt, rt->obj_idx++);
 		// else if (ft_strncmp("A ", line, 2) == 0)
 		// 	parse_sphere(line + 2);
 		// else if (ft_strncmp("L ", line, 2) == 0)

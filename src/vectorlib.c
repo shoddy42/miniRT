@@ -6,13 +6,13 @@
 /*   By: root <root@student.codam.nl>                 +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/16 21:57:49 by root          #+#    #+#                 */
-/*   Updated: 2022/12/16 22:00:38 by root          ########   odam.nl         */
+/*   Updated: 2022/12/20 03:16:11 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/miniRT.h"
 
-double		dot(t_vec a, t_vec b)
+double	dot(t_vec a, t_vec b)
 {
 	double ret;
 
@@ -20,7 +20,7 @@ double		dot(t_vec a, t_vec b)
 	return (ret);
 }
 
-t_vec		cross(t_vec a, t_vec b)
+t_vec	cross(t_vec a, t_vec b)
 {
 	t_vec	cross;
 
@@ -30,17 +30,25 @@ t_vec		cross(t_vec a, t_vec b)
 	return (cross);
 }
 
-double		sqr(double x)
+double	sqr(double x)
 {
 	return (x * x);
 }
 
-double		vec_length_squared(t_vec vec)
+double	vec_length_squared(t_vec vec)
 {
 	return (sqr(vec[X]) + sqr(vec[Y]) + sqr(vec[Z]));
 }
 
-double		vec_length(t_vec vec)
+double	vec_length(t_vec vec)
 {
 	return (sqrt(vec_length_squared(vec)));
+}
+
+t_vec	vec_normalize(t_vec vec)
+{
+	t_vec	normal;
+
+	normal = vec / vec_length(vec);
+	return (normal);
 }

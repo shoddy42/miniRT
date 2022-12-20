@@ -6,15 +6,18 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:26:03 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/16 22:08:03 by root          ########   odam.nl         */
+/*   Updated: 2022/12/20 07:57:16 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINIRT_H
 # define MINIRT_H
-# define WINDOW_WIDTH 1000
-# define WINDOW_HEIGHT 1000
+# define WINDOW_WIDTH 800
+# define WINDOW_HEIGHT 400
+# define RAY_T_MIN 0.0001f
+# define RAY_T_MAX 1.0e30f
 # define FOV 90
+# include "vector.h"
 # include "../mlx/include/MLX42/MLX42.h"
 # include "../libft/include/libft.h"
 # include <stdlib.h>
@@ -37,28 +40,6 @@
 # define VIOLET	"\1\33[38;5;183m\2"
 # define RESET	"\1\33[0m\2"
 # define END	"\1\33[0m\2\3"
-typedef double	t_vec __attribute__ ((vector_size (4 * sizeof(double))));
-
-typedef enum e_vecnum
-{
-	X,
-	Y,
-	Z,
-	W
-}	t_vecnum;
-
-typedef enum e_vec_colour
-{
-	R,
-	G,
-	B,
-	A
-}	t_vec_colour;
-
-typedef struct s_vector
-{
-	t_vec		vec;
-}	t_vector;
 
 typedef enum e_object_type
 {
@@ -68,33 +49,22 @@ typedef enum e_object_type
 	CAMERA,
 	LIGHT,
 	AMBIENT,
+	ERROR,
 }	t_obj_type;
-
-typedef struct s_sphere
-{
-	t_vec		pos;
-	float		diameter;
-	t_vec		colour;
-}	t_sphere;
-
-
-typedef union u_base
-{
-	t_sphere	sphere;
-}	t_base;
 
 typedef struct s_object
 {
 	t_obj_type	type;
-	t_base		shape;
+
 	t_vec		pos;
-	t_vec		colour;
 	t_vec		angle;
+	t_vec		colour;
 	float		diameter;
 	float		height;
 
-	float		fov;
+	float		fov; //for camera only.
 }	t_obj;
+
 
 typedef struct s_ray
 {
@@ -104,9 +74,27 @@ typedef struct s_ray
 	
 }	t_ray;
 
+typedef struct s_hit_record
+{
+	double	t;
+	t_vec	p;
+	t_vec	normal;
+	//todo: material.
+}	t_hit_record;
+
+typedef struct s_inter
+{
+	double	t;
+	t_ray	ray;
+	t_obj	*obj;
+	t_vec	colour;
+	// t_vec	p;
+	// t_vec	normal;
+}	t_inter;
+
 typedef struct s_camera
 {
-	t_vec	pos;
+	t_vec	pos; // should rename to origin
 	t_vec	direction;
 	
 	float	view_height;
@@ -136,10 +124,14 @@ void	rt_error(char *error_msg);
 
 
 
+
 bool	parse_sphere(char *line, t_raytracer *rt, int idx);
 bool	parse_plane(char *line, t_raytracer *rt, int idx);
 bool	parse_cylinder(char *line, t_raytracer *rt, int idx);
 bool	parse_camera(char *line, t_raytracer *rt, int idx);
+
+
+
 
 char	*set_rgb(char *line, t_obj *obj);
 char	*set_pos(char *line, t_obj *obj);
@@ -147,10 +139,19 @@ char	*set_orientation(char *line, t_obj *obj);
 
 
 // vector lib
-double		vec_length(t_vec vec);
-double		vec_length_squared(t_vec vec);
-double		sqr(double x);
-double		dot(t_vec a, t_vec b);
-t_vec		cross(t_vec a, t_vec b);
+double	vec_length(t_vec vec);
+double	vec_length_squared(t_vec vec);
+double	sqr(double x);
+double	dot(t_vec a, t_vec b);
+t_vec	cross(t_vec a, t_vec b);
+t_vec	vec_normalize(t_vec vec);
 
+//intersections
+bool	hit_sphere(t_obj sphere, const t_ray *ray, t_inter *intersection);
+
+//rays
+t_vec	ray_calculate_t(t_ray *ray, const double t);
+
+//unsorted
+void	cast_rays(t_raytracer *rt);
 #endif
