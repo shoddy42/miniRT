@@ -6,23 +6,30 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:26:03 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/21 05:51:32 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/21 07:19:03 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINIRT_H
 # define MINIRT_H
+// currently forced to stay at 2:1 aspect ratio
 # define WINDOW_WIDTH 1600
 # define WINDOW_HEIGHT 800
+
+
+
+# define MAX_WINDOW_WIDTH 2560
+# define MAX_WINDOW_HEIGHT 1440
 # define RAY_T_MIN 0.0001f
 # define RAY_T_MAX 1.0e30f
 # define PI 3.1415926535897932385
-# define MAX_SAMPLES 10
+# define ENHANCE_SAMPLES 10
+# define MAX_SAMPLES 250
 # define FOV 90
 # include "vector.h"
 # include "../mlx/include/MLX42/MLX42.h"
 # include "../libft/include/libft.h"
-// # include <stdlib.h>
+# include <stdlib.h>
 # include <stdio.h>
 # include <fcntl.h>
 # include <unistd.h>
@@ -106,13 +113,15 @@ typedef struct s_camera
 typedef struct s_raytracer
 {
 	mlx_t		*mlx;
-	double	**last_frame;
+	t_vec		**last_frame;
 	mlx_image_t	*img;
 	t_vector	**map;
 	t_camera	camera;
 	t_obj		*objects;
 	int			obj_idx;
 	
+	int			total_samples;
+	bool		key_pressed;
 	char		*title;
 }				t_raytracer;
 
@@ -151,7 +160,10 @@ bool	hit_sphere(t_obj *sphere, t_ray *ray, t_inter *intersection);
 t_vec	ray_at_t(t_ray *ray, const double t);
 
 //unsorted
+
 void	cast_rays(t_raytracer *rt);
 t_ray	get_ray(t_camera *cam, double u, double v);
 void	update_camera(t_raytracer *rt);
+void	hook(void *param);
+void	enhance(t_raytracer *rt);
 #endif

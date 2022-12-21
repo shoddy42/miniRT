@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:46:37 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/21 05:59:24 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/21 06:50:44 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,11 @@ void	hook(void *param)
 	t_raytracer	*rt;
 
 	rt = param;
-	draw_vec(data->map, data);
+	if (rt->key_pressed == true)
+		return ;
+	// printf ("executing time %f\n", mlx_get_time());
+	// cast_rays(rt);
+	rt = param;
 }
 
 void	keyhook(mlx_key_data_t keydata, void	*param)
@@ -27,6 +31,8 @@ void	keyhook(mlx_key_data_t keydata, void	*param)
 
 	rt = param;
 	magnitude = 1;
+	rt->key_pressed = true;
+	// printf ("KEY PRESSED!\n");
 	if (keydata.key == MLX_KEY_ESCAPE)
 	{
 		mlx_close_window(rt->mlx);
@@ -53,7 +59,9 @@ void	keyhook(mlx_key_data_t keydata, void	*param)
 		rt->camera.pos[Y] -= 0.1;
 	if (keydata.key == MLX_KEY_E)
 		rt->camera.pos[Y] += 0.1;
-	ft_bzero(rt->img->pixels, rt->img->width * rt->img->height * sizeof(uint32_t));
-	cast_rays(rt);
-	update_camera(rt);
+	if (keydata.key == MLX_KEY_R)
+		enhance(rt);
+	// ft_bzero(rt->img->pixels, rt->img->width * rt->img->height * sizeof(uint32_t));
+	// cast_rays(rt);
+	// update_camera(rt);
 }
