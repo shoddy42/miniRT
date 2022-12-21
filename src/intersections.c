@@ -6,14 +6,14 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/20 03:30:22 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/21 01:57:23 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/21 04:23:09 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/miniRT.h"
 
 //maybe turn sphere into *sphere?
-bool	hit_sphere(t_obj sphere, const t_ray *ray, t_inter *intersection)
+bool	hit_sphere(t_obj *sphere, t_ray *ray, t_inter *intersection)
 {
 	t_vec	aligned;
 	double	discriminant;
@@ -21,31 +21,46 @@ bool	hit_sphere(t_obj sphere, const t_ray *ray, t_inter *intersection)
 	double	b;
 	double	c;
 	
-	aligned = ray->origin - sphere.pos;
-	a = dot(ray->direction, ray->direction);
-	b = 2.0 * dot(aligned, ray->direction);
-	// b = dot(aligned, ray->direction);
-	c = dot(aligned, aligned) - sqr(sphere.diameter / 2);
-	// discriminant = b * b - a * c;
-	discriminant = (b * b) - (4 * a * c);
+	aligned = ray->origin - sphere->pos;
+	// a = dot(ray->direction, ray->direction);
+	a = vec_length_squared(ray->direction);
+	b = dot(aligned, ray->direction);
+	c = dot(aligned, aligned) - sqr(sphere->diameter / 2);
+	discriminant = b * b - a * c;
 	if (discriminant < 0.0f)
 		return (false);
-	intersection->t	= (-b - sqrt(discriminant)) / (2.0 * a);
-	return (true);
+
 	// printf ("max = %f\n", intersection->t);
 	double	min;
 	double	plus;
-	min = (-b - sqrt(discriminant) / a);
-	plus = (-b + sqrt(discriminant) / a);
-	//todo: get rid of tmp <= instead use tmp < ?
-	if (min > RAY_T_MIN && min <= intersection->t)
+	min = (-b - sqrt(discriminant)) / a;
+	plus = (-b + sqrt(discriminant)) / a;
+	if (min > RAY_T_MIN && min < intersection->t)
+	{
 		intersection->t = min;
-	else if (plus > RAY_T_MIN && plus <= intersection->t)
+	}
+	else if (plus > RAY_T_MIN && plus < intersection->t)
+	{
 		intersection->t = plus;
+	}
 	else
 		return (false);
-	intersection->obj = &sphere;
-	intersection->colour = sphere.colour;
+	intersection->ray = *ray;
+	intersection->obj = sphere;
+	intersection->colour = sphere->colour;
+	intersection->p = ray_at_t(ray, intersection->t);
+	intersection->normal = vec_normalize((intersection->p - sphere->pos) / (sphere->diameter / 2));
+	if (dot(ray->direction, intersection->normal) > 0.0)
+	{
+		intersection->normal *= -1;
+		intersection->front_face = false;
+		//IN THE SPHR
+	}
+	else
+	{
+		intersection->front_face = true;
+		//OUT THE SPHER
+	}
 	return (true);
 }
 

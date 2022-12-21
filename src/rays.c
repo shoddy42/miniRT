@@ -22,5 +22,7 @@ t_ray	get_ray(t_camera *cam, double u, double v)
 {
 	t_ray	ray;
 
+	ray.origin = cam->pos;
+	ray.direction = cam->low_left_corner + (u * cam->horizontal) + (v * cam->vertical) - cam->pos;
 	return (ray);
 }

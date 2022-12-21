@@ -6,21 +6,23 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:26:03 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/21 01:32:47 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/21 05:51:32 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINIRT_H
 # define MINIRT_H
-# define WINDOW_WIDTH 800
-# define WINDOW_HEIGHT 400
+# define WINDOW_WIDTH 1600
+# define WINDOW_HEIGHT 800
 # define RAY_T_MIN 0.0001f
 # define RAY_T_MAX 1.0e30f
+# define PI 3.1415926535897932385
+# define MAX_SAMPLES 10
 # define FOV 90
 # include "vector.h"
 # include "../mlx/include/MLX42/MLX42.h"
 # include "../libft/include/libft.h"
-# include <stdlib.h>
+// # include <stdlib.h>
 # include <stdio.h>
 # include <fcntl.h>
 # include <unistd.h>
@@ -74,13 +76,6 @@ typedef struct s_ray
 	
 }	t_ray;
 
-typedef struct s_hit_record
-{
-	double	t;
-	t_vec	p;
-	t_vec	normal;
-	//todo: material.
-}	t_hit_record;
 
 typedef struct s_inter
 {
@@ -88,8 +83,9 @@ typedef struct s_inter
 	t_ray	ray;
 	t_obj	*obj;
 	t_vec	colour;
-	// t_vec	p;
-	// t_vec	normal;
+	t_vec	p; // the position at which we hit
+	t_vec	normal; //the normal 
+	bool	front_face;
 }	t_inter;
 
 typedef struct s_camera
@@ -97,6 +93,7 @@ typedef struct s_camera
 	t_vec	pos; // should rename to origin
 	t_vec	direction;
 	
+	double	aspect_ratio;
 	double	view_height;
 	double	view_width;
 	double	focal_length;
@@ -109,6 +106,7 @@ typedef struct s_camera
 typedef struct s_raytracer
 {
 	mlx_t		*mlx;
+	double	**last_frame;
 	mlx_image_t	*img;
 	t_vector	**map;
 	t_camera	camera;
@@ -147,11 +145,13 @@ t_vec	cross(t_vec a, t_vec b);
 t_vec	vec_normalize(t_vec vec);
 
 //intersections
-bool	hit_sphere(t_obj sphere, const t_ray *ray, t_inter *intersection);
+bool	hit_sphere(t_obj *sphere, t_ray *ray, t_inter *intersection);
 
 //rays
 t_vec	ray_at_t(t_ray *ray, const double t);
 
 //unsorted
 void	cast_rays(t_raytracer *rt);
+t_ray	get_ray(t_camera *cam, double u, double v);
+void	update_camera(t_raytracer *rt);
 #endif
