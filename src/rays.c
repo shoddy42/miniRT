@@ -12,7 +12,7 @@
 
 #include "../include/miniRT.h"
 
-t_vec	ray_calculate_t(t_ray *ray, const double t)
+t_vec	ray_at_t(t_ray *ray, const double t)
 {
 	return (ray->origin + (ray->direction * t));
 }

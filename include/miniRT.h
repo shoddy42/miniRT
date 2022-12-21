@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:26:03 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/20 07:57:16 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/21 01:32:47 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,10 +59,10 @@ typedef struct s_object
 	t_vec		pos;
 	t_vec		angle;
 	t_vec		colour;
-	float		diameter;
-	float		height;
+	double		diameter;
+	double		height;
 
-	float		fov; //for camera only.
+	double		fov; //for camera only.
 }	t_obj;
 
 
@@ -97,13 +97,13 @@ typedef struct s_camera
 	t_vec	pos; // should rename to origin
 	t_vec	direction;
 	
-	float	view_height;
-	float	view_width;
-	float	focal_length;
+	double	view_height;
+	double	view_width;
+	double	focal_length;
 	t_vec	low_left_corner;
 	t_vec	horizontal;
 	t_vec	vertical;
-	float	fov;
+	double	fov;
 }	t_camera;
 
 typedef struct s_raytracer
@@ -150,7 +150,7 @@ t_vec	vec_normalize(t_vec vec);
 bool	hit_sphere(t_obj sphere, const t_ray *ray, t_inter *intersection);
 
 //rays
-t_vec	ray_calculate_t(t_ray *ray, const double t);
+t_vec	ray_at_t(t_ray *ray, const double t);
 
 //unsorted
 void	cast_rays(t_raytracer *rt);

@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 19:44:21 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/20 04:01:29 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/21 01:01:16 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,9 +96,16 @@ bool	parse_camera(char *line, t_raytracer *rt, int idx)
 	rt->camera.view_width = 4.0;
 	rt->camera.focal_length = 1.0;
 
-	rt->camera.horizontal = (t_vec){rt->camera.view_width, 0, 0};
-	rt->camera.vertical = (t_vec){0, rt->camera.view_height, 0};
-	rt->camera.low_left_corner = rt->camera.pos - (rt->camera.horizontal / 2) - (rt->camera.vertical/2) - (t_vec){0,0,rt->camera.focal_length};
+	// rt->camera.horizontal = (t_vec){rt->camera.view_width, 0, 0};
+	// rt->camera.vertical = (t_vec){0, rt->camera.view_height, 0};
+	// rt->camera.low_left_corner = rt->camera.pos - (rt->camera.horizontal / 2) - (rt->camera.vertical/2) - (t_vec){0,0,rt->camera.focal_length};
+	
+	//hardcoded bad
+	rt->camera.horizontal = (t_vec){4.0, 0.0, 0.0,};
+	rt->camera.vertical = (t_vec){0.0, 2.0, 0.0,};
+	rt->camera.pos = (t_vec){0.0, 0.0, 0.0,};
+	rt->camera.low_left_corner = (t_vec){-2.0, -1.0, -1.0};
+	
 	//todo: check for additional input that isnt needed?	
 	return (true);
 }

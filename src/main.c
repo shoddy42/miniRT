@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:13:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/20 07:57:59 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/21 01:59:36 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,19 +66,20 @@ uint32_t	vec_to_colour(const t_vec vec)
 
 bool	ray_to_all_obj(t_ray *ray, t_raytracer *rt, t_inter *intersection)
 {
-	// t_inter intersection;
 	t_hit_record	record;
 	t_obj			*obj;
 	int				i;
 	double			closest;
 	bool			hit;
 	
+	hit = false;
 	i = -1;
 	while (++i < rt->obj_idx)
 	{
 		obj = rt->objects + i;
 		if (obj->type == SPHERE)
-			hit_sphere(*obj, ray, intersection);
+			if (hit_sphere(*obj, ray, intersection))
+				hit = true;
 	}
 	return (hit);
 }
@@ -88,17 +89,17 @@ uint32_t	ray_colour(t_ray *ray, t_raytracer *rt)
 	t_vec	unit_direction = vec_normalize(ray->direction);
 	t_inter	intersection;
 	intersection.t = RAY_T_MAX;
+	intersection.t = 0.0f;
 	double	t;
 	
 	ray_to_all_obj(ray, rt, &intersection);
-
-	t = hit_sphere(rt->objects[2], ray, &intersection);
-	// while ()
-	if (intersection.t > 0.0 && intersection.t != RAY_T_MAX)
+	// if (hit_sphere(rt->objects[2], ray, &intersection))
+	// hit_sphere(rt->objects[2], ray, &intersection);
+	if (intersection.t > 0.0f)
 	{
 		t_vec new;
-		new = vec_normalize(ray_calculate_t(ray, intersection.t) - (t_vec){0,0,-1}) + 1;
-		return (vec_to_colour_normal(0.5 * new));
+		new = vec_normalize(ray_at_t(ray, intersection.t) - (t_vec){0,0,-1});
+		return (vec_to_colour_normal(0.5 * (new + 1)));
 	}
 	t = 0.5 * (unit_direction[Y] + 1.0);
 	return (vec_to_colour_normal(((1.0 - t) * (t_vec){1.0, 1.0, 1.0}) + (t * (t_vec){0.5, 0.7, 1.0})));
@@ -126,10 +127,9 @@ void	cast_rays(t_raytracer *rt)
 			ray.origin = rt->camera.pos;
 			ray.direction = rt->camera.low_left_corner + (u * rt->camera.horizontal) + (v * rt->camera.vertical) - rt->camera.pos;
 
-			// col = vec_to_colour((t_vec){(float)x / (float)WINDOW_WIDTH, (float)y / (float)WINDOW_HEIGHT, (float)0.2});
+			// col = vec_to_colour((t_vec){(double)x / (double)WINDOW_WIDTH, (double)y / (double)WINDOW_HEIGHT, (double)0.2});
 			// col = vec_to_colour(ray_colour(&ray));
 			col = ray_colour(&ray, rt);
-			// col = yeet_ray(rt, &ray);
 			mlx_put_pixel(rt->img, x, WINDOW_HEIGHT - y - 1, col);
 		}
 	}

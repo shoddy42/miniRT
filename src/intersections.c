@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/20 03:30:22 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/20 08:14:59 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/21 01:57:23 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,13 @@ bool	hit_sphere(t_obj sphere, const t_ray *ray, t_inter *intersection)
 	discriminant = (b * b) - (4 * a * c);
 	if (discriminant < 0.0f)
 		return (false);
-
+	intersection->t	= (-b - sqrt(discriminant)) / (2.0 * a);
+	return (true);
 	// printf ("max = %f\n", intersection->t);
 	double	min;
 	double	plus;
-	min = (-b - sqrt(b * b - a * c) / a);
-	plus = (-b + sqrt(b * b - a * c) / a);
+	min = (-b - sqrt(discriminant) / a);
+	plus = (-b + sqrt(discriminant) / a);
 	//todo: get rid of tmp <= instead use tmp < ?
 	if (min > RAY_T_MIN && min <= intersection->t)
 		intersection->t = min;
