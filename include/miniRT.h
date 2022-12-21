@@ -6,22 +6,23 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:26:03 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/21 08:47:22 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/21 10:52:30 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINIRT_H
 # define MINIRT_H
 // currently forced to stay at 2:1 aspect ratio
-# define WINDOW_WIDTH 2400
-# define WINDOW_HEIGHT 1200
+# define WINDOW_WIDTH 800
+# define WINDOW_HEIGHT 400
 
 
 
 # define MAX_WINDOW_WIDTH 2560
 # define MAX_WINDOW_HEIGHT 1440
-# define RAY_T_MIN 0.0001f
+# define RAY_T_MIN 0.001f
 # define RAY_T_MAX 1.0e30f
+# define RAY_MAX_DEPTH 50
 # define PI 3.1415926535897932385
 # define ENHANCE_SAMPLES 10
 # define MAX_SAMPLES 250
