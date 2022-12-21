@@ -6,15 +6,15 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:26:03 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/21 10:52:30 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/21 13:06:52 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINIRT_H
 # define MINIRT_H
 // currently forced to stay at 2:1 aspect ratio
-# define WINDOW_WIDTH 800
-# define WINDOW_HEIGHT 400
+# define WINDOW_WIDTH 1600
+# define WINDOW_HEIGHT 800
 
 
 

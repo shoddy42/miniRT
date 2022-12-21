@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:13:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/21 10:54:35 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/21 13:21:29 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,6 +126,14 @@ bool	ray_to_all_obj(t_ray *ray, t_raytracer *rt, t_inter *intersection)
 	return (hit);
 }
 
+t_vec	hemisphere(t_vec normal)
+{
+	t_vec random = vec_normalize(random_in_sphere());
+	if (dot(random, normal) > 0.0)
+		return (random);
+	return (-random);
+}
+
 t_vec	ray_colour(t_ray *ray, t_raytracer *rt, int depth)
 {
 	t_vec	unit_direction = vec_normalize(ray->direction);
@@ -139,12 +147,13 @@ t_vec	ray_colour(t_ray *ray, t_raytracer *rt, int depth)
 	// if this if statement fails, all other things in intersection are SEGF material.
 	if (intersection.t > 0.0f && intersection.t != RAY_T_MAX)
 	{
-		t_vec random = intersection.p + intersection.normal + vec_normalize(random_in_sphere());
+		t_vec random = intersection.p + intersection.normal + hemisphere(intersection.normal);
 		return (0.5 * ray_colour(&(t_ray){intersection.p, random - intersection.p, (t_vec){0}}, rt, depth - 1));
 		// return ((0.5 * (intersection.normal + (t_vec){1.0,1.0,1.0})));
 	}
 	t = 0.5 * (unit_direction[Y] + 1.0);
 	return (((1.0 - t) * (t_vec){1.0, 1.0, 1.0}) + (t * (t_vec){0.5, 0.7, 1.0}));
+	// return ((t_vec){0,0,0});
 }
 
 // quickly does the first frame only.
@@ -175,7 +184,9 @@ void	first_frame(t_raytracer *rt)
 			ray = get_ray(&rt->camera, u, v);
 			vcol = ray_colour(&ray, rt, RAY_MAX_DEPTH);
 			rt->last_frame[y][x] = vcol;
-			// vcol *= sqrt(1.0);
+			vcol[R] = sqrt(scale * vcol[R]);
+			vcol[G] = sqrt(scale * vcol[G]);
+			vcol[B] = sqrt(scale * vcol[B]);
 			col = vec_to_colour_normal(vcol, rt);
 			mlx_put_pixel(rt->img, x, WINDOW_HEIGHT - y - 1, col);
 		}
@@ -220,7 +231,7 @@ void	enhance(t_raytracer *rt)
 	}
 	printf ("???? [%f][%f][%f]\n", rt->last_frame[0][WINDOW_WIDTH - 1][X], rt->last_frame[0][WINDOW_WIDTH - 1][Y], rt->last_frame[0][WINDOW_WIDTH - 1][Z]);
 
-	// double		scale;
+	double		scale;
 	y = WINDOW_HEIGHT;
 	rt->total_samples += samples;
 	while (--y >= 0)
@@ -229,8 +240,11 @@ void	enhance(t_raytracer *rt)
 		while (++x < WINDOW_WIDTH)
 		{
 			// scale = 1.0 / rt->total_samples;
-			vcol = rt->last_frame[y][x] / (double)rt->total_samples;
-			// vcol *= sqrt(scale);
+			scale = 1.0 / rt->total_samples;
+			vcol = rt->last_frame[y][x];
+			vcol[R] = sqrt(scale * vcol[R]);
+			vcol[G] = sqrt(scale * vcol[G]);
+			vcol[B] = sqrt(scale * vcol[B]);
 			col = vec_to_colour_normal(vcol, rt);
 			mlx_put_pixel(rt->img, x, WINDOW_HEIGHT - y - 1, col);
 		}
@@ -246,7 +260,7 @@ void	init_struct(t_raytracer *rt, char **av)
 
 	open_scene(av, rt);
 	// title = ft_strjoin("miniRT - ", av[1]);
-	rt->mlx = mlx_init(WINDOW_WIDTH, WINDOW_HEIGHT, "title", true);
+	rt->mlx = mlx_init(WINDOW_WIDTH, WINDOW_HEIGHT, "title", false);
 	if (!rt->mlx)
 		exit(1);
 	rt->img = mlx_new_image(rt->mlx, rt->mlx->width, rt->mlx->height);
