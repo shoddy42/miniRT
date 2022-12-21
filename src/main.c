@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:13:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/21 07:18:18 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/21 09:09:30 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,40 @@ void	rt_error(char *error_msg)
 	exit (1);
 }
 
+//todo: add whole random suite to libft.
+//todo: add the whole vectorlib bs to libft.
+double ft_rand_double(bool allow_negative, int init)
+{
+	static int seed;
+	
+	if (init != 0)
+		seed = init;
+	seed = (1103515245 * seed + 12345) % (int)pow(2, 31);
+	if (allow_negative == false && seed < 0)
+		return ((double)seed * -1);
+	return ((double)seed);
+}
+
+/**
+ * @brief Generates a random number 
+ * 
+ * @param allow_negative whether returning a negative number is allowed or not.
+ * @param init 
+ * @return double 
+ */
+double ft_rand_double_normal(bool allow_negative, int init)
+{
+	static int	seed;
+	double		ret;
+	
+	if (init != 0)
+		seed = init;
+	seed = (1103515245 * seed + 12345) % (int)pow(2, 31);
+	ret = (double)seed / RAND_MAX;
+	if (allow_negative ==false && ret < 0)
+		ret *= -1;
+	return (ret);
+}
 
 double	clamp(double x, double min, double max)
 {
@@ -96,6 +130,7 @@ t_vec	ray_colour(t_ray *ray, t_raytracer *rt)
 	return (((1.0 - t) * (t_vec){1.0, 1.0, 1.0}) + (t * (t_vec){0.5, 0.7, 1.0}));
 }
 
+// quickly does the first frame only.
 void	first_frame(t_raytracer *rt)
 {
 	int x;
@@ -119,6 +154,8 @@ void	first_frame(t_raytracer *rt)
 			v = (double)y / (double)WINDOW_HEIGHT;
 			ray = get_ray(&rt->camera, u, v);
 			vcol = ray_colour(&ray, rt);
+			rt->last_frame[y][x] = vcol;
+			rt->total_samples = 1;
 			col = vec_to_colour_normal(vcol);
 			mlx_put_pixel(rt->img, x, WINDOW_HEIGHT - y - 1, col);
 		}
@@ -127,50 +164,8 @@ void	first_frame(t_raytracer *rt)
 	// printf ("FIRST ? [%f][%f][%f]\n", rt->last_frame[0][WINDOW_WIDTH - 1][X], rt->last_frame[0][WINDOW_WIDTH - 1][Y], rt->last_frame[0][WINDOW_WIDTH - 1][Z]);
 }
 
-void	cast_rays(t_raytracer *rt)
-{
-	int x;
-	int y;
-	int samples;
-	uint32_t col;
-	t_vec	vcol;
-	t_ray	ray;
-
-	double u;
-	double v;
-	y = WINDOW_HEIGHT;
-	col = 0;
-	vcol = (t_vec){0.0, 0.0, 0.0};
-	while (--y >= 0)
-	{
-		// printf ("Lines remaining [%i]\n", WINDOW_HEIGHT - y);
-		x = -1;
-		while (++x < WINDOW_WIDTH)
-		{
-			samples = -1;
-			while (++samples <= MAX_SAMPLES)
-			{
-				u = ((double)x + drand48()) / (double)WINDOW_WIDTH;
-				if (samples == 0)
-					u = ((double)x / (double)WINDOW_WIDTH);
-				v = ((double)y + drand48()) / (double)WINDOW_HEIGHT;
-				if (samples == 0)
-					v = (double)y / (double)WINDOW_HEIGHT;
-
-				ray = get_ray(&rt->camera, u, v);
-				// col = vec_to_colour((t_vec){(double)x / (double)WINDOW_WIDTH, (double)y / (double)WINDOW_HEIGHT, (double)0.2});
-				// col = vec_to_colour(ray_colour(&ray));
-				vcol += ray_colour(&ray, rt);
-			}
-			if (samples > 0)
-				vcol /= (double)samples;
-			col = vec_to_colour_normal(vcol);
-			mlx_put_pixel(rt->img, x, WINDOW_HEIGHT - y - 1, col);
-		}
-	}
-}
-
 // handles anti-aliasing.
+// todo: REPLACE DRAND48 WITH OWN FUNCTION. Linear congruential generator.
 void	enhance(t_raytracer *rt)
 {
 	int x;
@@ -187,21 +182,17 @@ void	enhance(t_raytracer *rt)
 	samples = -1;
 	while (++samples < ENHANCE_SAMPLES && rt->total_samples < MAX_SAMPLES)
 	{
+		printf ("remaining [%i]\n", ENHANCE_SAMPLES - samples);
 		y = WINDOW_HEIGHT;
 		while (--y >= 0)
 		{
-			// printf ("Lines remaining [%i]\n", WINDOW_HEIGHT - y);
 			x = -1;
 			while (++x < WINDOW_WIDTH)
 			{
-
-				u = ((double)x + drand48()) / (double)WINDOW_WIDTH;
-				if (samples == 0)
-					u = ((double)x / (double)WINDOW_WIDTH);
-				v = ((double)y + drand48()) / (double)WINDOW_HEIGHT;
-				if (samples == 0)
-					v = (double)y / (double)WINDOW_HEIGHT;
-
+				// u = ((double)x + drand48()) / (double)WINDOW_WIDTH;
+				// v = ((double)y + drand48()) / (double)WINDOW_HEIGHT;
+				u = ((double)x + ft_rand_double_normal(false, 0)) / (double)WINDOW_WIDTH;
+				v = ((double)y + ft_rand_double_normal(false, 0)) / (double)WINDOW_HEIGHT;
 				ray = get_ray(&rt->camera, u, v);
 				rt->last_frame[y][x] += ray_colour(&ray, rt);
 			}
@@ -210,7 +201,6 @@ void	enhance(t_raytracer *rt)
 	printf ("???? [%f][%f][%f]\n", rt->last_frame[0][WINDOW_WIDTH - 1][X], rt->last_frame[0][WINDOW_WIDTH - 1][Y], rt->last_frame[0][WINDOW_WIDTH - 1][Z]);
 
 	y = WINDOW_HEIGHT;
-	vcol = (t_vec){0.0, 0.0, 0.0};
 	rt->total_samples += samples;
 	while (--y >= 0)
 	{
@@ -218,8 +208,6 @@ void	enhance(t_raytracer *rt)
 		while (++x < WINDOW_WIDTH)
 		{
 			vcol = rt->last_frame[y][x] / (double)rt->total_samples;
-			// vcol = rt->last_frame[y][x];
-				// vcol /= (double)samples;
 			col = vec_to_colour_normal(vcol);
 			mlx_put_pixel(rt->img, x, WINDOW_HEIGHT - y - 1, col);
 		}
@@ -262,10 +250,6 @@ int	main(int ac, char **av)
 	while (++i < WINDOW_HEIGHT)
 		rt.last_frame[i] = ft_calloc(WINDOW_WIDTH + 1, sizeof(t_vec));
 	first_frame(&rt);
-	// while (++wait < UINT32_MAX)
-		// ;
-	// cast_rays(&rt);
-	// draw_vec(rt.map, &rt);
 	mlx_loop(rt.mlx);
 	mlx_delete_image(rt.mlx, rt.img);
 	mlx_terminate(rt.mlx);
