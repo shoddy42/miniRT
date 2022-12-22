@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:46:37 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/21 06:50:44 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/22 12:16:14 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,21 @@ void	hook(void *param)
 	// printf ("executing time %f\n", mlx_get_time());
 	// cast_rays(rt);
 	rt = param;
+}
+
+void	clear_frames(t_raytracer *rt)
+{
+	int	x;
+	int y;
+
+	y = -1;
+	while (++y < WINDOW_HEIGHT)
+	{
+		x = -1;
+		while (++x < WINDOW_WIDTH)
+			rt->last_frame[y][x] = (t_vec){0,0,0};
+	}
+	rt->total_samples = 0;
 }
 
 void	keyhook(mlx_key_data_t keydata, void	*param)
@@ -43,10 +58,15 @@ void	keyhook(mlx_key_data_t keydata, void	*param)
 		mlx_close_window(rt->mlx);
 		return ;
 	}
-	if (mlx_is_key_down(rt->mlx, MLX_KEY_LEFT_SHIFT))
-		magnitude *= 10;
 	if (keydata.action == MLX_RELEASE)
 		return ;
+	if (keydata.key == MLX_KEY_R)
+	{
+		enhance(rt);
+		return ;
+	}
+	if (mlx_is_key_down(rt->mlx, MLX_KEY_LEFT_SHIFT))
+		magnitude *= 10;
 	if (keydata.key == MLX_KEY_A)
 		rt->camera.pos[X] -= 0.1;
 	if (keydata.key == MLX_KEY_D)
@@ -59,8 +79,10 @@ void	keyhook(mlx_key_data_t keydata, void	*param)
 		rt->camera.pos[Y] -= 0.1;
 	if (keydata.key == MLX_KEY_E)
 		rt->camera.pos[Y] += 0.1;
-	if (keydata.key == MLX_KEY_R)
-		enhance(rt);
+	clear_frames(rt);
+
+	
+	// ft_bzero(rt->last_frame, WINDOW_WIDTH * WINDOW_HEIGHT);
 	// ft_bzero(rt->img->pixels, rt->img->width * rt->img->height * sizeof(uint32_t));
 	// cast_rays(rt);
 	// update_camera(rt);

@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:13:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/22 11:28:35 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/22 12:17:47 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,7 @@ t_vec	hemisphere(t_vec normal)
 	return (-random);
 }
 
+//todo: colour with HSV
 t_vec	ray_colour(t_ray *ray, t_raytracer *rt, int depth)
 {
 	t_vec	unit_direction = vec_normalize(ray->direction);
@@ -152,7 +153,9 @@ t_vec	ray_colour(t_ray *ray, t_raytracer *rt, int depth)
 	{
 		//for recursive bouncing of rays!
 		t_vec random = intersection.p + intersection.normal + hemisphere(intersection.normal);
-		return ((0.5 * ray_colour(&(t_ray){intersection.p, random - intersection.p, (t_vec){0}}, rt, depth - 1)) + (0.5 * intersection.colour));
+		t_vec tmp = (vec_normalize(0.5 * intersection.colour));
+		//0.5 * tmp is temporary test to force some of a shape's own colour in there!
+		return ((0.5 * tmp) + (0.5 * ray_colour(&(t_ray){intersection.p, random - intersection.p, (t_vec){0}}, rt, depth - 1)));
 		
 		//backup bad render
 		return ((0.5 * (intersection.normal + (t_vec){1.0,1.0,1.0})));
@@ -194,6 +197,7 @@ void	first_frame(t_raytracer *rt)
 			vcol[R] = sqrt(scale * vcol[R]);
 			vcol[G] = sqrt(scale * vcol[G]);
 			vcol[B] = sqrt(scale * vcol[B]);
+			// col = vec_to_colour(vcol);
 			col = vec_to_colour_normal(vcol, rt);
 			mlx_put_pixel(rt->img, x, WINDOW_HEIGHT - y - 1, col);
 		}
