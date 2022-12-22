@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:26:03 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/21 13:06:52 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/22 11:07:48 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,4 +168,5 @@ t_ray	get_ray(t_camera *cam, double u, double v);
 void	update_camera(t_raytracer *rt);
 void	hook(void *param);
 void	enhance(t_raytracer *rt);
+bool	hit_plane(t_obj *plane, t_ray *ray, t_inter *intersection);
 #endif

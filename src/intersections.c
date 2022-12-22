@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/20 03:30:22 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/21 04:23:09 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/22 11:21:25 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,3 +64,25 @@ bool	hit_sphere(t_obj *sphere, t_ray *ray, t_inter *intersection)
 	return (true);
 }
 
+//still seems a bit bugged.
+bool	hit_plane(t_obj *plane, t_ray *ray, t_inter *intersection)
+{
+	double ddotn;
+
+	ddotn = dot(ray->direction, plane->angle);
+
+	if (ddotn == 0.0f)
+		return (false);
+	double t;
+	t = dot(plane->pos - ray->origin, plane->angle) / ddotn;
+	if (t <= RAY_T_MIN || t >= intersection->t)
+		return (false);
+	// printf ("plane time [%f]\n", t);
+	intersection->t = t;
+	intersection->obj = plane;
+	intersection->ray = *ray;
+	intersection->colour = plane->colour;
+	intersection->p = ray_at_t(ray, intersection->t);
+	intersection->normal = vec_normalize(plane->angle);
+	return (true);
+}

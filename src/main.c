@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:13:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/21 13:21:29 by wkonings      ########   odam.nl         */
+/*   Updated: 2022/12/22 11:28:35 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,6 +122,9 @@ bool	ray_to_all_obj(t_ray *ray, t_raytracer *rt, t_inter *intersection)
 		if (obj->type == SPHERE)
 			if (hit_sphere(obj, ray, intersection))
 				hit = true;
+		if (obj->type == PLANE)
+			if (hit_plane(obj, ray, intersection))
+				hit = true;
 	}
 	return (hit);
 }
@@ -147,12 +150,16 @@ t_vec	ray_colour(t_ray *ray, t_raytracer *rt, int depth)
 	// if this if statement fails, all other things in intersection are SEGF material.
 	if (intersection.t > 0.0f && intersection.t != RAY_T_MAX)
 	{
+		//for recursive bouncing of rays!
 		t_vec random = intersection.p + intersection.normal + hemisphere(intersection.normal);
-		return (0.5 * ray_colour(&(t_ray){intersection.p, random - intersection.p, (t_vec){0}}, rt, depth - 1));
-		// return ((0.5 * (intersection.normal + (t_vec){1.0,1.0,1.0})));
+		return ((0.5 * ray_colour(&(t_ray){intersection.p, random - intersection.p, (t_vec){0}}, rt, depth - 1)) + (0.5 * intersection.colour));
+		
+		//backup bad render
+		return ((0.5 * (intersection.normal + (t_vec){1.0,1.0,1.0})));
 	}
 	t = 0.5 * (unit_direction[Y] + 1.0);
 	return (((1.0 - t) * (t_vec){1.0, 1.0, 1.0}) + (t * (t_vec){0.5, 0.7, 1.0}));
+	// return (((1.0 - t) * (t_vec){1.0, 1.0, 1.0}) + (t * (t_vec){1.0, 0.7, 0.3}));
 	// return ((t_vec){0,0,0});
 }
 
@@ -196,7 +203,6 @@ void	first_frame(t_raytracer *rt)
 }
 
 // handles anti-aliasing.
-// todo: REPLACE DRAND48 WITH OWN FUNCTION. Linear congruential generator.
 void	enhance(t_raytracer *rt)
 {
 	int x;
@@ -220,8 +226,6 @@ void	enhance(t_raytracer *rt)
 			x = -1;
 			while (++x < WINDOW_WIDTH)
 			{
-				// u = ((double)x + drand48()) / (double)WINDOW_WIDTH;
-				// v = ((double)y + drand48()) / (double)WINDOW_HEIGHT;
 				u = ((double)x + ft_rand_double_normal(false, 0)) / (double)WINDOW_WIDTH;
 				v = ((double)y + ft_rand_double_normal(false, 0)) / (double)WINDOW_HEIGHT;
 				ray = get_ray(&rt->camera, u, v);
@@ -239,7 +243,7 @@ void	enhance(t_raytracer *rt)
 		x = -1;
 		while (++x < WINDOW_WIDTH)
 		{
-			// scale = 1.0 / rt->total_samples;
+			// get colour of all frames and even them out, then adjusts for gamma
 			scale = 1.0 / rt->total_samples;
 			vcol = rt->last_frame[y][x];
 			vcol[R] = sqrt(scale * vcol[R]);
@@ -259,8 +263,8 @@ void	init_struct(t_raytracer *rt, char **av)
 	char *title;
 
 	open_scene(av, rt);
-	// title = ft_strjoin("miniRT - ", av[1]);
-	rt->mlx = mlx_init(WINDOW_WIDTH, WINDOW_HEIGHT, "title", false);
+	title = ft_strjoin("miniRT - ", av[1]);
+	rt->mlx = mlx_init(WINDOW_WIDTH, WINDOW_HEIGHT, title, false);
 	if (!rt->mlx)
 		exit(1);
 	rt->img = mlx_new_image(rt->mlx, rt->mlx->width, rt->mlx->height);
@@ -269,7 +273,7 @@ void	init_struct(t_raytracer *rt, char **av)
 	mlx_image_to_window(rt->mlx, rt->img, 0, 0);
 	mlx_key_hook(rt->mlx, &keyhook, rt);
 	mlx_loop_hook(rt->mlx, &hook, rt);
-	// free (title);
+	free (title);
 }
 
 int	main(int ac, char **av)
