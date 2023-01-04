@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:13:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/04 01:36:38 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/04 01:51:25 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,16 +18,15 @@ void	rt_error(char *error_msg)
 	exit (1);
 }
 
-double	deg_to_rad(const float a)
+double	deg_to_rad(const double a)
 {
 	return (a / 360.0f * 2.0f * M_PI);
 }
 
-double	rad_to_deg(const float a)
+double	rad_to_deg(const double a)
 {
 	return (a / (2.0f * M_PI) * 360.0f);
 }
-
 
 //todo: add whole random suite to libft.
 //todo: add the whole vectorlib bs to libft.
