@@ -6,15 +6,15 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:26:03 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/04 01:51:48 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/04 21:25:33 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINIRT_H
 # define MINIRT_H
 // currently forced to stay at 2:1 aspect ratio
-# define WINDOW_WIDTH 1600
-# define WINDOW_HEIGHT 800
+# define WINDOW_WIDTH 800
+# define WINDOW_HEIGHT 400
 
 # define MAX_WINDOW_WIDTH 2560 //todo: enable these.
 # define MAX_WINDOW_HEIGHT 1440
@@ -114,8 +114,9 @@ typedef struct s_inter
 
 typedef struct s_camera
 {
-	t_vec	pos; // should rename to origin
+	t_vec	pos;
 	t_vec	direction;
+	t_vec	up;
 	
 	double	aspect_ratio;
 	double	view_height;
