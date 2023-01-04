@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 19:44:21 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/04 22:21:02 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/05 00:17:59 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ bool	parse_sphere(char *line, t_raytracer *rt, int idx)
 	// rt->objects[idx].colour = ft_calloc(1, sizeof(t_vec));
 	rt->objects[idx].colour[R] = 42;
 	rt->objects[idx].diameter = ft_atod(line);
-	while (*line && (ft_isdigit(*line) || *line == '.'))
+	while (*line && (ft_isdigit(*line) || *line == '.' || *line == '-'))
 		line++;
 	while (*line && ft_isspace(*line))
 		line++;
@@ -65,7 +65,6 @@ bool	parse_sphere(char *line, t_raytracer *rt, int idx)
 	printf ("colour?: [%f][%f][%f]\n", rt->objects[idx].colour[R], rt->objects[idx].colour[G], rt->objects[idx].colour[B]);
 	printf (END "\n");
 	// normalizes colour between 0.0 and 1.0
-
 	rt->objects[idx].colour = col_scale(rt->objects[idx].colour);
 	printf (RED "colour?: [%f][%f][%f]\n" END, rt->objects[idx].colour[R], rt->objects[idx].colour[G], rt->objects[idx].colour[B]);
 	//todo: check for additional input that isnt needed?
@@ -78,6 +77,8 @@ bool	parse_sphere(char *line, t_raytracer *rt, int idx)
 	printf (ORANGE"mat = %i\n" END, rt->objects[idx].material);
 	rt->objects[idx].fuzzy = ft_atof(line);
 	printf (ORANGE"fuzz = %f\n" END, rt->objects[idx].fuzzy);
+	if (rt->objects[idx].material == DIELECTRIC)
+		rt->objects[idx].refraction = rt->objects[idx].fuzzy; 
 	return (true);
 }
 
@@ -97,9 +98,11 @@ bool	parse_plane(char *line, t_raytracer *rt, int idx)
 }
 
 
-//todo: make this its own class andn ot use objects.idx at all anymore.
+//todo: make this its own class and not use objects.idx at all anymore.
 bool	parse_camera(char *line, t_raytracer *rt, int idx)
 {
+	t_camera *cam;
+
 	rt->objects[idx].type = CAMERA;
 	printf (YELLOW "parsing camera! [%s] idx [%i]\n", line, idx);
 	line = set_pos(line, &rt->objects[idx]);
@@ -111,11 +114,20 @@ bool	parse_camera(char *line, t_raytracer *rt, int idx)
 	printf ("FOV?: [%f]", rt->objects[idx].fov);
 	printf (END "\n");
 
-	rt->camera.aspect_ratio = WINDOW_WIDTH / WINDOW_HEIGHT;
-	rt->camera.pos = rt->objects[idx].pos;
-	rt->camera.direction = rt->objects[idx].angle;
-	rt->camera.fov = rt->objects[idx].fov;
-	rt->camera.up = (t_vec){0,1,0};
+	cam = &rt->camera;
+
+	cam->pos = rt->objects[idx].pos;
+	cam->direction = rt->objects[idx].angle;
+	cam->fov = rt->objects[idx].fov;
+
+	cam->aspect_ratio = WINDOW_WIDTH / WINDOW_HEIGHT;
+	cam->up = (t_vec){0,1,0};
+
+	// cam->focus_dist = 1;
+	cam->aperature = 2.0;
+	cam->lens_radius = cam->aperature / 2;
+	cam->focus_dist = vec_length((cam->pos - cam->direction));
+	
 	update_camera(rt);
 
 	//todo: check for additional input that isnt needed?	

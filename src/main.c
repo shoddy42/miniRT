@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:13:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/04 01:51:25 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/05 00:31:14 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,104 +16,6 @@ void	rt_error(char *error_msg)
 {
 	printf("%s\n", error_msg);
 	exit (1);
-}
-
-double	deg_to_rad(const double a)
-{
-	return (a / 360.0f * 2.0f * M_PI);
-}
-
-double	rad_to_deg(const double a)
-{
-	return (a / (2.0f * M_PI) * 360.0f);
-}
-
-//todo: add whole random suite to libft.
-//todo: add the whole vectorlib bs to libft.
-double ft_rand_double(bool allow_negative, int init)
-{
-	static int seed;
-	
-	if (init != 0)
-		seed = init;
-	seed = (1103515245 * seed + 12345) % (int)pow(2, 31);
-	if (allow_negative == false && seed < 0)
-		return ((double)seed * -1);
-	return ((double)seed);
-}
-
-/**
- * @brief Generates a random number 
- * 
- * @param allow_negative whether returning a negative number is allowed or not.
- * @param init 
- * @return double 
- */
-double ft_rand_double_normal(bool allow_negative, int init)
-{
-	static int	seed;
-	double		ret;
-	
-	if (init != 0)
-		seed = init;
-	seed = (1103515245 * seed + 12345) % (int)pow(2, 31);
-	ret = (double)seed / RAND_MAX;
-	if (allow_negative ==false && ret < 0)
-		ret *= -1;
-	return (ret);
-}
-
-t_vec	random_in_sphere(void)
-{
-	t_vec	target;
-	int		i;
-
-	i = 0;
-	while (++i < 1000)
-	{
-		target = (t_vec){	ft_rand_double_normal(true, 0),
-							ft_rand_double_normal(true, 0),
-							ft_rand_double_normal(true, 0)};
-		if (vec_length_squared(target) < 1)
-			return (target);
-	}
-	return ((t_vec){0,0,0});
-}
-
-double	clamp(double x, double min, double max)
-{
-	if (x < min)
-		return (min);
-	if (x > max)
-		return (max);
-	return (x);
-}
-//works on colour ranges from 0 to 1
-uint32_t	vec_to_colour_normal(t_vec vec, t_raytracer *rt)
-{
-	uint32_t	colour;
-
-	colour = 0;
-	colour += (unsigned int)(255 * clamp(vec[R], 0.0, 0.999)) << 24;
-	colour += (unsigned int)(255 * clamp(vec[G], 0.0, 0.999)) << 16;
-	colour += (unsigned int)(255 * clamp(vec[B], 0.0, 0.999)) << 8;
-	colour += 0x000000FF;
-	// printf ("colour n?: %u \n", colour);
-	return (colour);
-}
-
-//works on colour ranges from 0 to 255
-uint32_t	vec_to_colour(const t_vec vec)
-{
-	uint32_t colour;
-
-	colour = 0;
-	colour += (unsigned int)(vec[R]) << 24;
-	colour += (unsigned int)(vec[G]) << 16;
-	colour += (unsigned int)(vec[B]) << 8;
-	colour += 0x000000FF;
-	// printf ("colour?: %u \n", colour);
-	return (colour);
 }
 
 bool	ray_to_all_obj(t_ray *ray, t_raytracer *rt, t_inter *intersection)
@@ -148,12 +50,27 @@ bool	near_zero(t_vec vec)
 	return (false);
 }
 
+double	reflectance(double cosine, double ref_idx)
+{
+	double r0 = (1 - ref_idx) / (1 + ref_idx);
+	r0 = r0 * r0;
+	return (r0 + (1 - r0) * pow((1 - cosine), 5));
+}
+
+t_vec	refract(const t_vec uv, const t_vec n, double etai_over_etat)
+{
+	double	cos_theta = fmin(dot(-uv, n), 1.0);
+	t_vec	r_out_perp = etai_over_etat * (uv + cos_theta * n);
+	t_vec	r_out_parallel = -sqrt(fabs(1.0 - vec_length_squared(r_out_perp))) * n;
+	return (r_out_perp + r_out_parallel);
+}
+
 t_vec	reflect(const t_vec v, const t_vec n)
 {
 	return (v - 2 * dot(v, n) * n);
 }
 
-//random_unit_vector
+//random_unit_vector for diffuse random generation of vectors
 t_vec	hemisphere(t_vec normal)
 {
 	t_vec random = vec_normalize(random_in_sphere());
@@ -166,7 +83,6 @@ t_ray	scatter_ray(t_ray *ray, t_inter *intersection)
 {
 	t_vec	scatter_direction;
 	t_ray	scattered;
-	// t_vec	albedo;
 	t_vec reflected;
 	//lambertian (default)
 	if (intersection->material == 0)
@@ -183,6 +99,29 @@ t_ray	scatter_ray(t_ray *ray, t_inter *intersection)
 		reflected = reflect(vec_normalize(ray->direction), intersection->normal);
 		scattered = (t_ray){intersection->p, reflected + intersection->fuzzy * vec_normalize(random_in_sphere())};
 		// attenuation = intersection->colour;
+	}
+	//glass and water?
+	else if (intersection->material == DIELECTRIC)
+	{
+		double	refraction_ratio;
+		t_vec	unit_direction = vec_normalize(ray->direction);
+		double	cos_theta = fmin(dot(-unit_direction, intersection->normal), 1.0);
+		double	sin_theta = sqrt(1.0 - cos_theta * cos_theta);
+		bool	cannot_refract = false;
+
+		t_vec	direction;
+		if (intersection->front_face)
+			refraction_ratio = 1.0 / intersection->refraction;
+		else
+			refraction_ratio = intersection->refraction;
+		if (refraction_ratio * sin_theta > 1.0)
+			cannot_refract = true;
+
+		if (cannot_refract || reflectance(cos_theta, refraction_ratio) > ft_rand_double_normal(false, 0))
+			direction = reflect(unit_direction, intersection->normal);		
+		else
+			direction = refract(unit_direction, intersection->normal, refraction_ratio);
+		scattered = (t_ray){intersection->p, direction};
 	}
 	else
 		return ((t_ray){(t_vec){-42}, (t_vec){-42}});

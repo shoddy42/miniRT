@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/15 14:49:40 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/03 23:51:27 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/05 00:16:47 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,10 @@ char	*set_rgb(char *line, t_obj *obj)
 {
 	obj->colour[R] = ft_atod(line);
 	if (obj->colour[R] > 255 || obj->colour[R] < 0)
+	{
+		printf ("r? %f\n", obj->colour[R]);
 		rt_error("R value must be in range of [0 - 255]!\n");
+	}
 	line = ft_strchr(line, ',') + 1;
 	if (!line)
 		rt_error("No G in line!\n");

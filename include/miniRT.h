@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:26:03 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/04 21:25:33 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/04 23:43:21 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,14 @@ typedef enum e_object_type
 	ERROR,
 }	t_obj_type;
 
+typedef enum e_material_type
+{
+	DIFFUSE,
+	METAL,
+	DIELECTRIC,
+
+}	t_mat_type;
+
 typedef struct s_material
 {
 	t_vec	colour;
@@ -85,6 +93,7 @@ typedef struct s_object
 
 	int			material;
 	float		fuzzy;
+	float		refraction;
 
 	double		fov; //for camera only.
 }	t_obj;
@@ -108,7 +117,7 @@ typedef struct s_inter
 
 	int		material;
 	float	fuzzy;
-
+	float	refraction;
 	bool	front_face;
 }	t_inter;
 
@@ -118,10 +127,21 @@ typedef struct s_camera
 	t_vec	direction;
 	t_vec	up;
 	
+	t_vec	w;
+	t_vec	u;
+	t_vec	v;
+
 	double	aspect_ratio;
+
+	//depth of field block
+	bool	dof;
+	double	aperature;
+	double	lens_radius;
+	double	focus_dist;
+
+	//movement block
 	double	view_height;
 	double	view_width;
-	double	focal_length;
 	t_vec	low_left_corner;
 	t_vec	horizontal;
 	t_vec	vertical;
@@ -180,6 +200,7 @@ t_vec	ray_at_t(t_ray *ray, const double t);
 //unsorted
 
 void	cast_rays(t_raytracer *rt);
+uint32_t	vec_to_colour_normal(t_vec vec, t_raytracer *rt);
 t_ray	get_ray(t_camera *cam, double u, double v);
 void	update_camera(t_raytracer *rt);
 void	hook(void *param);
@@ -187,5 +208,10 @@ void	enhance(t_raytracer *rt);
 void	first_frame(t_raytracer *rt);
 double	rad_to_deg(const double a);
 double	deg_to_rad(const double a);
+t_vec	random_in_disc(void);
+t_vec	random_in_sphere(void);
+double	clamp(double x, double min, double max);
+double ft_rand_double(bool allow_negative, int init);
+double ft_rand_double_normal(bool allow_negative, int init);
 bool	hit_plane(t_obj *plane, t_ray *ray, t_inter *intersection);
 #endif

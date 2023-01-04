@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:46:37 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/04 21:53:48 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/04 23:17:50 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,11 @@ void	keyhook(mlx_key_data_t keydata, void	*param)
 		rt->camera.direction[X] -= 0.1;
 	if (keydata.key == MLX_KEY_RIGHT)
 		rt->camera.direction[X] += 0.1;
+	if (keydata.key == MLX_KEY_F)
+	{
+		rt->camera.dof = (!rt->camera.dof);
+		printf ("dof = %i\n", rt->camera.dof);
+	}
 	clear_frames(rt);
 	update_camera(rt);
 	first_frame(rt);
