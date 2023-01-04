@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/20 03:30:22 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/22 11:21:25 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/04 01:25:42 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,8 @@ bool	hit_sphere(t_obj *sphere, t_ray *ray, t_inter *intersection)
 	intersection->obj = sphere;
 	intersection->colour = sphere->colour;
 	intersection->p = ray_at_t(ray, intersection->t);
+	intersection->material = sphere->material;
+	intersection->fuzzy = sphere->fuzzy;
 	intersection->normal = vec_normalize((intersection->p - sphere->pos) / (sphere->diameter / 2));
 	if (dot(ray->direction, intersection->normal) > 0.0)
 	{
@@ -82,7 +84,9 @@ bool	hit_plane(t_obj *plane, t_ray *ray, t_inter *intersection)
 	intersection->obj = plane;
 	intersection->ray = *ray;
 	intersection->colour = plane->colour;
+	intersection->fuzzy = plane->fuzzy;
 	intersection->p = ray_at_t(ray, intersection->t);
 	intersection->normal = vec_normalize(plane->angle);
+	intersection->material = plane->material;
 	return (true);
 }

@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:26:03 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/22 11:07:48 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/04 01:19:29 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,15 @@
 # define WINDOW_WIDTH 1600
 # define WINDOW_HEIGHT 800
 
-
-
-# define MAX_WINDOW_WIDTH 2560
+# define MAX_WINDOW_WIDTH 2560 //todo: enable these.
 # define MAX_WINDOW_HEIGHT 1440
+# define MIN_WINDOW_WIDTH 80
+# define MIN_WINDOW_HEIGHT 40
+
 # define RAY_T_MIN 0.001f
 # define RAY_T_MAX 1.0e30f
 # define RAY_MAX_DEPTH 50
+# define BOUNCES 5
 # define PI 3.1415926535897932385
 # define ENHANCE_SAMPLES 10
 # define MAX_SAMPLES 250
@@ -63,6 +65,14 @@ typedef enum e_object_type
 	ERROR,
 }	t_obj_type;
 
+typedef struct s_material
+{
+	t_vec	colour;
+	t_vec	attenuation;
+	t_vec	reflectance;
+	float	fuzzy;
+}	t_mat;
+
 typedef struct s_object
 {
 	t_obj_type	type;
@@ -73,6 +83,9 @@ typedef struct s_object
 	double		diameter;
 	double		height;
 
+	int			material;
+	float		fuzzy;
+
 	double		fov; //for camera only.
 }	t_obj;
 
@@ -80,9 +93,7 @@ typedef struct s_object
 typedef struct s_ray
 {
 	t_vec	origin;
-	t_vec	direction;
-	t_vec	pos;
-	
+	t_vec	direction;	
 }	t_ray;
 
 
@@ -94,6 +105,10 @@ typedef struct s_inter
 	t_vec	colour;
 	t_vec	p; // the position at which we hit
 	t_vec	normal; //the normal 
+
+	int		material;
+	float	fuzzy;
+
 	bool	front_face;
 }	t_inter;
 
@@ -168,5 +183,6 @@ t_ray	get_ray(t_camera *cam, double u, double v);
 void	update_camera(t_raytracer *rt);
 void	hook(void *param);
 void	enhance(t_raytracer *rt);
+void	first_frame(t_raytracer *rt);
 bool	hit_plane(t_obj *plane, t_ray *ray, t_inter *intersection);
 #endif

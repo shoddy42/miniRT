@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:46:37 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/22 12:16:14 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/03 20:04:32 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ void	keyhook(mlx_key_data_t keydata, void	*param)
 	if (keydata.key == MLX_KEY_E)
 		rt->camera.pos[Y] += 0.1;
 	clear_frames(rt);
+	first_frame(rt);
 
 	
 	// ft_bzero(rt->last_frame, WINDOW_WIDTH * WINDOW_HEIGHT);

@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 19:44:21 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/21 01:01:16 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/04 01:21:52 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,14 @@ bool	parse_cylinder(char *line, t_raytracer *rt, int idx)
 	return (true);
 }
 
+t_vec	col_scale(t_vec original)
+{
+	t_vec	colour;
+
+	colour = original / 255;
+	return (colour);
+}
+
 bool	parse_sphere(char *line, t_raytracer *rt, int idx)
 {
 	rt->objects[idx].type = SPHERE;
@@ -56,7 +64,20 @@ bool	parse_sphere(char *line, t_raytracer *rt, int idx)
 	printf ("diameter: %f\n", rt->objects[idx].diameter);
 	printf ("colour?: [%f][%f][%f]\n", rt->objects[idx].colour[R], rt->objects[idx].colour[G], rt->objects[idx].colour[B]);
 	printf (END "\n");
+	// normalizes colour between 0.0 and 1.0
+
+	rt->objects[idx].colour = col_scale(rt->objects[idx].colour);
+	printf (RED "colour?: [%f][%f][%f]\n" END, rt->objects[idx].colour[R], rt->objects[idx].colour[G], rt->objects[idx].colour[B]);
 	//todo: check for additional input that isnt needed?
+	// BONUS ZONE
+	rt->objects[idx].material = ft_atoi(line);
+	while (*line && (ft_isdigit(*line) || *line == '.'))
+		line++;
+	while (*line && ft_isspace(*line))
+		line++;
+	printf (ORANGE"mat = %i\n" END, rt->objects[idx].material);
+	rt->objects[idx].fuzzy = ft_atof(line);
+	printf (ORANGE"fuzz = %f\n" END, rt->objects[idx].fuzzy);
 	return (true);
 }
 

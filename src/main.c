@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:13:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/22 12:17:47 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/04 01:36:38 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,17 @@ void	rt_error(char *error_msg)
 	printf("%s\n", error_msg);
 	exit (1);
 }
+
+double	deg_to_rad(const float a)
+{
+	return (a / 360.0f * 2.0f * M_PI);
+}
+
+double	rad_to_deg(const float a)
+{
+	return (a / (2.0f * M_PI) * 360.0f);
+}
+
 
 //todo: add whole random suite to libft.
 //todo: add the whole vectorlib bs to libft.
@@ -61,15 +72,14 @@ t_vec	random_in_sphere(void)
 	i = 0;
 	while (++i < 1000)
 	{
-		target = (t_vec){ ft_rand_double_normal(true, 0),
-						ft_rand_double_normal(true, 0),
-						ft_rand_double_normal(true, 0)};
+		target = (t_vec){	ft_rand_double_normal(true, 0),
+							ft_rand_double_normal(true, 0),
+							ft_rand_double_normal(true, 0)};
 		if (vec_length_squared(target) < 1)
 			return (target);
 	}
 	return ((t_vec){0,0,0});
 }
-
 
 double	clamp(double x, double min, double max)
 {
@@ -129,6 +139,22 @@ bool	ray_to_all_obj(t_ray *ray, t_raytracer *rt, t_inter *intersection)
 	return (hit);
 }
 
+bool	near_zero(t_vec vec)
+{
+	double near;
+
+	near = 1e-8;
+	if (fabs(vec[X]) < near && fabs(vec[Y]) < near && fabs(vec[Z]) < near)
+		return (true);
+	return (false);
+}
+
+t_vec	reflect(const t_vec v, const t_vec n)
+{
+	return (v - 2 * dot(v, n) * n);
+}
+
+//random_unit_vector
 t_vec	hemisphere(t_vec normal)
 {
 	t_vec random = vec_normalize(random_in_sphere());
@@ -137,12 +163,42 @@ t_vec	hemisphere(t_vec normal)
 	return (-random);
 }
 
+t_ray	scatter_ray(t_ray *ray, t_inter *intersection)
+{
+	t_vec	scatter_direction;
+	t_ray	scattered;
+	// t_vec	albedo;
+	t_vec reflected;
+	//lambertian (default)
+	if (intersection->material == 0)
+	{
+		scatter_direction = intersection->p + hemisphere(intersection->normal);
+		if (near_zero(scatter_direction))
+			scatter_direction = intersection->normal;
+		scattered = (t_ray){intersection->p, scatter_direction - intersection->p};
+		// attenuation = intersection->colour;
+	}
+	//reflective 
+	else if (intersection->material == 1)
+	{
+		reflected = reflect(vec_normalize(ray->direction), intersection->normal);
+		scattered = (t_ray){intersection->p, reflected + intersection->fuzzy * vec_normalize(random_in_sphere())};
+		// attenuation = intersection->colour;
+	}
+	else
+		return ((t_ray){(t_vec){-42}, (t_vec){-42}});
+
+	return (scattered);
+}
+
 //todo: colour with HSV
 t_vec	ray_colour(t_ray *ray, t_raytracer *rt, int depth)
 {
 	t_vec	unit_direction = vec_normalize(ray->direction);
 	t_inter	intersection;
+	t_ray	scattered;
 	intersection.t = RAY_T_MAX;
+	intersection.material = 0;
 	double	t;
 	
 	if (depth <= 0)
@@ -151,19 +207,21 @@ t_vec	ray_colour(t_ray *ray, t_raytracer *rt, int depth)
 	// if this if statement fails, all other things in intersection are SEGF material.
 	if (intersection.t > 0.0f && intersection.t != RAY_T_MAX)
 	{
-		//for recursive bouncing of rays!
-		t_vec random = intersection.p + intersection.normal + hemisphere(intersection.normal);
-		t_vec tmp = (vec_normalize(0.5 * intersection.colour));
-		//0.5 * tmp is temporary test to force some of a shape's own colour in there!
-		return ((0.5 * tmp) + (0.5 * ray_colour(&(t_ray){intersection.p, random - intersection.p, (t_vec){0}}, rt, depth - 1)));
+		// t_vec random = intersection.p + intersection.normal + hemisphere(intersection.normal); // CAUSES DARK SHADOWS!
+		t_vec random = intersection.p + hemisphere(intersection.normal);
+		t_ray test;
+		// intersection.material = 0;
+		// test =  (t_ray){intersection.p, random - intersection.p};
+		test = scatter_ray(ray, &intersection);
 		
-		//backup bad render
-		return ((0.5 * (intersection.normal + (t_vec){1.0,1.0,1.0})));
+		// return (0.5f * ray_colour(&test, rt, depth - 1));
+		return (intersection.colour * ray_colour(&test, rt, depth - 1));
+		// return (0.5 * ray_colour(&(t_ray){intersection.p, random - intersection.p}, rt, depth - 1)); // normal render 
+		// t_vec tmp = (vec_normalize(0.5 * intersection.colour)); //part of terrible colour
+		// return ((0.5 * tmp) + (0.5 * ray_colour(&(t_ray){intersection.p, random - intersection.p}, rt, depth - 1))); //TERRIBLE COLOUR RENDER
 	}
 	t = 0.5 * (unit_direction[Y] + 1.0);
 	return (((1.0 - t) * (t_vec){1.0, 1.0, 1.0}) + (t * (t_vec){0.5, 0.7, 1.0}));
-	// return (((1.0 - t) * (t_vec){1.0, 1.0, 1.0}) + (t * (t_vec){1.0, 0.7, 0.3}));
-	// return ((t_vec){0,0,0});
 }
 
 // quickly does the first frame only.
