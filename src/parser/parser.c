@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 19:14:07 by wkonings      #+#    #+#                 */
-/*   Updated: 2022/12/20 00:26:57 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/05 01:13:47 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,9 +61,9 @@ bool	open_scene(char **av, t_raytracer *rt)
 			parse_cylinder(line + 3, rt, rt->obj_idx++);
 		else if (ft_strncmp("C ", line, 2) == 0)
 			parse_camera(line + 2, rt, rt->obj_idx++);
+		else if (ft_strncmp("L ", line, 2) == 0)
+			parse_light(line + 2, rt, rt->obj_idx++);
 		// else if (ft_strncmp("A ", line, 2) == 0)
-		// 	parse_sphere(line + 2);
-		// else if (ft_strncmp("L ", line, 2) == 0)
 		// 	parse_sphere(line + 2);
 		if (line)
 			free (line);

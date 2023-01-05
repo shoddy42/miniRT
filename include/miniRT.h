@@ -6,15 +6,15 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:26:03 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/04 23:43:21 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/05 03:40:36 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINIRT_H
 # define MINIRT_H
 // currently forced to stay at 2:1 aspect ratio
-# define WINDOW_WIDTH 800
-# define WINDOW_HEIGHT 400
+# define WINDOW_WIDTH 1600
+# define WINDOW_HEIGHT 800
 
 # define MAX_WINDOW_WIDTH 2560 //todo: enable these.
 # define MAX_WINDOW_HEIGHT 1440
@@ -28,7 +28,7 @@
 # define PI 3.1415926535897932385
 # define ENHANCE_SAMPLES 10
 # define MAX_SAMPLES 250
-# define FOV 90
+# define FOV 180
 # include "vector.h"
 # include "../mlx/include/MLX42/MLX42.h"
 # include "../libft/include/libft.h"
@@ -94,6 +94,7 @@ typedef struct s_object
 	int			material;
 	float		fuzzy;
 	float		refraction;
+	float		brightness;
 
 	double		fov; //for camera only.
 }	t_obj;
@@ -174,7 +175,7 @@ bool	parse_sphere(char *line, t_raytracer *rt, int idx);
 bool	parse_plane(char *line, t_raytracer *rt, int idx);
 bool	parse_cylinder(char *line, t_raytracer *rt, int idx);
 bool	parse_camera(char *line, t_raytracer *rt, int idx);
-
+bool	parse_light(char *line, t_raytracer *rt, int idx);
 
 
 

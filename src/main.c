@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:13:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/05 00:31:14 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/05 03:42:28 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,6 +129,18 @@ t_ray	scatter_ray(t_ray *ray, t_inter *intersection)
 	return (scattered);
 }
 
+t_vec	get_light(t_raytracer *rt)
+{
+	t_obj	*obj;
+	int i;
+	i = -1;
+	while (rt->objects[++i].type != LIGHT)
+		;
+	if (rt->objects[i].type == LIGHT)
+		obj = &rt->objects[i];
+	return (obj->pos);
+}
+
 //todo: colour with HSV
 t_vec	ray_colour(t_ray *ray, t_raytracer *rt, int depth)
 {
@@ -153,10 +165,22 @@ t_vec	ray_colour(t_ray *ray, t_raytracer *rt, int depth)
 		test = scatter_ray(ray, &intersection);
 		
 		// return (0.5f * ray_colour(&test, rt, depth - 1));
-		return (intersection.colour * ray_colour(&test, rt, depth - 1));
+		t_vec light_dir = get_light(rt);
+		
+		double d;
+		if (intersection.material != DIELECTRIC)
+			d = fmax(dot(intersection.normal, -light_dir), 0.0f);
+		else
+			d = 1;
+		return (d * intersection.colour * ray_colour(&test, rt, depth - 1));
 		// return (0.5 * ray_colour(&(t_ray){intersection.p, random - intersection.p}, rt, depth - 1)); // normal render 
 		// t_vec tmp = (vec_normalize(0.5 * intersection.colour)); //part of terrible colour
 		// return ((0.5 * tmp) + (0.5 * ray_colour(&(t_ray){intersection.p, random - intersection.p}, rt, depth - 1))); //TERRIBLE COLOUR RENDER
+		
+		t_vec new;
+		return (d * intersection.colour);
+		new = vec_normalize(ray_at_t(ray, intersection.t) - (t_vec){0,0,-1}) + 1;
+		return (0.5 * new);
 	}
 	t = 0.5 * (unit_direction[Y] + 1.0);
 	return (((1.0 - t) * (t_vec){1.0, 1.0, 1.0}) + (t * (t_vec){0.5, 0.7, 1.0}));

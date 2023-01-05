@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/21 04:27:32 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/04 23:16:06 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/05 03:06:35 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,6 @@ void	update_camera(t_raytracer *rt)
 	double	theta;
 	double	h;
 	
-	printf ("mlx w: [%i] h: [%i] ratio = [%i]\n", WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH / WINDOW_HEIGHT);
-
 	theta = deg_to_rad(cam->fov);
 	h = tan(theta/2);
 	cam->view_height = 2.0 * h;
