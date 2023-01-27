@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 19:44:21 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/05 01:18:04 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/18 17:50:18 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,6 +150,28 @@ bool	parse_light(char *line, t_raytracer *rt, int idx)
 	// normalizes colour between 0.0 and 1.0
 	rt->objects[idx].colour = col_scale(rt->objects[idx].colour);
 	printf ("colour?: [%f][%f][%f]\n" END, rt->objects[idx].colour[R], rt->objects[idx].colour[G], rt->objects[idx].colour[B]);
+	//todo: check for additional input that isnt needed?
+	// BONUS ZONE
+	return (true);
+}
+
+bool	parse_ambient(char *line, t_raytracer *rt, int idx)
+{
+	rt->objects[idx].type = AMBIENT;
+	printf (ORANGE "parsing ambient! [%s] idx [%i]\n", line, idx);
+	rt->objects[idx].brightness = ft_atod(line);
+	printf ("brightness?: [%f]\n", rt->objects[idx].brightness);
+	while (*line && (ft_isdigit(*line) || *line == '.' || *line == '-'))
+		line++;
+	while (*line && ft_isspace(*line))
+		line++;
+	line = set_rgb(line, &rt->objects[idx]);
+	printf ("pos?: [%f][%f][%f]\n", rt->objects[idx].pos[X], rt->objects[idx].pos[Y], rt->objects[idx].pos[Z]);
+	rt->objects[idx].colour /= 255;
+	rt->ambient = &rt->objects[idx];
+	// normalizes colour between 0.0 and 1.0
+	// rt->objects[idx].colour = col_scale(rt->objects[idx].colour);
+	// printf ("colour?: [%f][%f][%f]\n" END, rt->objects[idx].colour[R], rt->objects[idx].colour[G], rt->objects[idx].colour[B]);
 	//todo: check for additional input that isnt needed?
 	// BONUS ZONE
 	return (true);

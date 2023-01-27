@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:13:59 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/05 03:42:28 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/27 13:26:05 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ t_ray	scatter_ray(t_ray *ray, t_inter *intersection)
 {
 	t_vec	scatter_direction;
 	t_ray	scattered;
-	t_vec reflected;
+	t_vec	reflected;
 	//lambertian (default)
 	if (intersection->material == 0)
 	{
@@ -157,14 +157,12 @@ t_vec	ray_colour(t_ray *ray, t_raytracer *rt, int depth)
 	// if this if statement fails, all other things in intersection are SEGF material.
 	if (intersection.t > 0.0f && intersection.t != RAY_T_MAX)
 	{
-		// t_vec random = intersection.p + intersection.normal + hemisphere(intersection.normal); // CAUSES DARK SHADOWS!
 		t_vec random = intersection.p + hemisphere(intersection.normal);
 		t_ray test;
-		// intersection.material = 0;
 		// test =  (t_ray){intersection.p, random - intersection.p};
 		test = scatter_ray(ray, &intersection);
 		
-		// return (0.5f * ray_colour(&test, rt, depth - 1));
+		return (0.5f * intersection.colour * ray_colour(&test, rt, depth - 1));
 		t_vec light_dir = get_light(rt);
 		
 		double d;
@@ -172,18 +170,23 @@ t_vec	ray_colour(t_ray *ray, t_raytracer *rt, int depth)
 			d = fmax(dot(intersection.normal, -light_dir), 0.0f);
 		else
 			d = 1;
-		return (d * intersection.colour * ray_colour(&test, rt, depth - 1));
+		return (0.5f * d * intersection.colour * ray_colour(&test, rt, depth - 1));
 		// return (0.5 * ray_colour(&(t_ray){intersection.p, random - intersection.p}, rt, depth - 1)); // normal render 
 		// t_vec tmp = (vec_normalize(0.5 * intersection.colour)); //part of terrible colour
 		// return ((0.5 * tmp) + (0.5 * ray_colour(&(t_ray){intersection.p, random - intersection.p}, rt, depth - 1))); //TERRIBLE COLOUR RENDER
 		
+		//D is experimental 
 		t_vec new;
 		return (d * intersection.colour);
 		new = vec_normalize(ray_at_t(ray, intersection.t) - (t_vec){0,0,-1}) + 1;
 		return (0.5 * new);
 	}
-	t = 0.5 * (unit_direction[Y] + 1.0);
-	return (((1.0 - t) * (t_vec){1.0, 1.0, 1.0}) + (t * (t_vec){0.5, 0.7, 1.0}));
+	// t = 0.5 * (unit_direction[Y] + 1.0);
+	//this is for the actual return
+	return (rt->ambient->colour);
+	//these are for sky simulations
+	// return ((t_vec){0.5,0.7,1});
+	// return (((1.0 - t) * (t_vec){1.0, 1.0, 1.0}) + (t * (t_vec){0.5, 0.7, 1.0}));
 }
 
 // quickly does the first frame only.
@@ -213,6 +216,7 @@ void	first_frame(t_raytracer *rt)
 			v = (double)y / (double)WINDOW_HEIGHT;
 			ray = get_ray(&rt->camera, u, v);
 			vcol = ray_colour(&ray, rt, RAY_MAX_DEPTH);
+			// vcol += rt->ambient->colour;
 			rt->last_frame[y][x] = vcol;
 			vcol[R] = sqrt(scale * vcol[R]);
 			vcol[G] = sqrt(scale * vcol[G]);
@@ -273,7 +277,9 @@ void	enhance(t_raytracer *rt)
 			vcol[R] = sqrt(scale * vcol[R]);
 			vcol[G] = sqrt(scale * vcol[G]);
 			vcol[B] = sqrt(scale * vcol[B]);
+			// vcol *= rt->ambient->colour;
 			col = vec_to_colour_normal(vcol, rt);
+			// col *= rt->ambient->colour;
 			mlx_put_pixel(rt->img, x, WINDOW_HEIGHT - y - 1, col);
 		}
 	}

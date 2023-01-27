@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 18:26:03 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/05 03:40:36 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/17 21:33:30 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,6 +157,7 @@ typedef struct s_raytracer
 	t_vector	**map;
 	t_camera	camera;
 	t_obj		*objects;
+	t_obj		*ambient;
 	int			obj_idx;
 	
 	int			total_samples;
@@ -176,6 +177,7 @@ bool	parse_plane(char *line, t_raytracer *rt, int idx);
 bool	parse_cylinder(char *line, t_raytracer *rt, int idx);
 bool	parse_camera(char *line, t_raytracer *rt, int idx);
 bool	parse_light(char *line, t_raytracer *rt, int idx);
+bool	parse_ambient(char *line, t_raytracer *rt, int idx);
 
 
 

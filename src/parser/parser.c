@@ -6,7 +6,7 @@
 /*   By: wkonings <wkonings@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/12/14 19:14:07 by wkonings      #+#    #+#                 */
-/*   Updated: 2023/01/05 01:13:47 by wkonings      ########   odam.nl         */
+/*   Updated: 2023/01/18 19:16:36 by wkonings      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,15 @@ void	alloc_objects(char *av, t_raytracer *rt)
 	obj_count = 0;
 	while (get_next_line(fd, &line) > 0)
 	{
+		printf ("%s\n", line);
 		if (ft_strncmp("", line, 1) != 0)
 			obj_count++;
 		if (line)
 			free (line);
 	}
+	get_next_line(fd, &line);
+	printf ("FINAL: %s\n", line);
+
 	if (line)
 		free (line);
 	rt->objects = ft_calloc(obj_count + 1, sizeof(t_obj));
@@ -63,8 +67,8 @@ bool	open_scene(char **av, t_raytracer *rt)
 			parse_camera(line + 2, rt, rt->obj_idx++);
 		else if (ft_strncmp("L ", line, 2) == 0)
 			parse_light(line + 2, rt, rt->obj_idx++);
-		// else if (ft_strncmp("A ", line, 2) == 0)
-		// 	parse_sphere(line + 2);
+		else if (ft_strncmp("A ", line, 2) == 0)
+			parse_ambient(line + 2,rt ,rt->obj_idx++);
 		if (line)
 			free (line);
 	}
