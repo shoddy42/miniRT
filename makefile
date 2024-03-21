@@ -16,8 +16,8 @@
 
 NAME 	:= miniRT
 FLAGS 	:= -pthread -mavx #-g -fsanitize=address  #-Wall -Wextra -Werror #//todo: RENABLE FLAGS WHEN HANDING IN FOR THE LOVE OF GOD
-CFLAGS	:= -w -Wunreachable-code -Ofast
-DEBUG 	:= #-g #-fsanitize=address
+CFLAGS	:= -w -Wunreachable-code -Ofast -j4
+DEBUG 	:= -g -fsanitize=address
 LIBS	:=	libft mlx
 LIBMLX	:= mlx
 LIBFT	:= libft
@@ -40,7 +40,7 @@ BIN_DIR		:= bin
 INCLUDE_DIR	:= include
 LIB_DIR		:= libft
 
-INCLUDES	:= libft/libft.a mlx/libmlx42.a -lglfw -L /Users/$(USER)/.brew/opt/glfw/lib/
+INCLUDES	:= libft/libft.a mlx/build/libmlx42.a -lglfw -L /Users/$(USER)/.brew/opt/glfw/lib/
 HEADERS_DIR	:= include
 INC			:= -I include
 
@@ -96,12 +96,13 @@ VIOLET	:= \1\33[38;5;183m\2
 #todo: dependancy on makefile
 $(NAME): $(OBJS) $(HEADERS) $(MAKEFILE)
 	@make all -C $(LIB_DIR)
-	@make -C $(LIBMLX)
+	cd $(LIBMLX) && cmake -B build
+	cd $(LIBMLX) && cmake --build build -j4
 	@printf "$(BLUE)Compiling $(YELLOW)$(NAME).\n$(END)"
 	@$(CC) -ldl -lglfw -lm $(FLAGS) $(DEBUG) $(SRCS) -o $(NAME) -I include -I mlx/include $(INCLUDES)
 	@printf "$(YELLOW)miniRT compiled!\n$(END)"
 
-all: $(BANNER) $(NAME)
+all: $(BANNER) $(NAME)	
 
 $(LIBMLX):
 	@git clone https://github.com/codam-coding-college/MLX42.git $(LIBMLX)
