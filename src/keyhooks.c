@@ -34,7 +34,11 @@ void	clear_frames(t_raytracer *rt)
 	{
 		x = -1;
 		while (++x < WINDOW_WIDTH)
-			rt->last_frame[y][x] = (t_vec){0,0,0};
+		{
+			rt->last_frame[y][x][Y] = 0;
+			rt->last_frame[y][x][X] = 0;
+			rt->last_frame[y][x][Z] = 0;
+		}
 	}
 	rt->total_samples = 0;
 }

@@ -16,13 +16,13 @@
 
 NAME 	:= miniRT
 FLAGS 	:= -pthread -mavx #-g -fsanitize=address  #-Wall -Wextra -Werror #//todo: RENABLE FLAGS WHEN HANDING IN FOR THE LOVE OF GOD
-CFLAGS	:= -w -Wunreachable-code -Ofast -j4
-DEBUG 	:= -g -fsanitize=address
+CFLAGS	:= -Ofast
+DEBUG 	:= #-g -fsanitize=address
 LIBS	:=	libft mlx
 LIBMLX	:= mlx
 LIBFT	:= libft
 MAKEFILE:= makefile
-CC		:= clang
+CC		:= gcc
 
 # ---------------------------------------- #
 # --------------- DIRECTORIES ------------ #d
@@ -40,7 +40,7 @@ BIN_DIR		:= bin
 INCLUDE_DIR	:= include
 LIB_DIR		:= libft
 
-INCLUDES	:= libft/libft.a mlx/build/libmlx42.a -lglfw -L /Users/$(USER)/.brew/opt/glfw/lib/
+INCLUDES	:= libft/libft.a mlx/build/libmlx42.a -lm -lglfw -L /Users/$(USER)/.brew/opt/glfw/lib/
 HEADERS_DIR	:= include
 INC			:= -I include
 

@@ -212,12 +212,18 @@ void	first_frame(t_raytracer *rt)
 		x = -1;
 		while (++x < WINDOW_WIDTH)
 		{
+			// printf("test x: %i y: %i\n", x, y);
 			u = (double)x / (double)WINDOW_WIDTH;
 			v = (double)y / (double)WINDOW_HEIGHT;
 			ray = get_ray(&rt->camera, u, v);
 			vcol = ray_colour(&ray, rt, RAY_MAX_DEPTH);
-			// vcol += rt->ambient->colour;
-			rt->last_frame[y][x] = vcol;
+
+			// vcol += rt->ambient->colour; //bugged
+			// rt->last_frame[y][x] = vcol; //segfaulting?
+			rt->last_frame[y][x][Y] = vcol[Y];
+			rt->last_frame[y][x][X] = vcol[X];
+			rt->last_frame[y][x][Z] = vcol[Z];
+			// printf("test 2 x: %i y: %i\n", x, y);
 			vcol[R] = sqrt(scale * vcol[R]);
 			vcol[G] = sqrt(scale * vcol[G]);
 			vcol[B] = sqrt(scale * vcol[B]);
@@ -257,7 +263,11 @@ void	enhance(t_raytracer *rt)
 				u = ((double)x + ft_rand_double_normal(false, 0)) / (double)WINDOW_WIDTH;
 				v = ((double)y + ft_rand_double_normal(false, 0)) / (double)WINDOW_HEIGHT;
 				ray = get_ray(&rt->camera, u, v);
-				rt->last_frame[y][x] += ray_colour(&ray, rt, RAY_MAX_DEPTH);
+				vcol = ray_colour(&ray, rt, RAY_MAX_DEPTH);
+				// rt->last_frame[y][x] += ray_colour(&ray, rt, RAY_MAX_DEPTH);
+				rt->last_frame[y][x][Y] += vcol[Y];
+				rt->last_frame[y][x][X] += vcol[X];
+				rt->last_frame[y][x][Z] += vcol[Z];
 			}
 		}
 	}
@@ -273,7 +283,10 @@ void	enhance(t_raytracer *rt)
 		{
 			// get colour of all frames and even them out, then adjusts for gamma
 			scale = 1.0 / rt->total_samples;
-			vcol = rt->last_frame[y][x];
+			// vcol = rt->last_frame[y][x];
+			vcol[Y] = rt->last_frame[y][x][Y];
+			vcol[X] = rt->last_frame[y][x][X];
+			vcol[Z] = rt->last_frame[y][x][Z];
 			vcol[R] = sqrt(scale * vcol[R]);
 			vcol[G] = sqrt(scale * vcol[G]);
 			vcol[B] = sqrt(scale * vcol[B]);
@@ -318,7 +331,7 @@ int	main(int ac, char **av)
 	init_struct(&rt, av);
 	rt.last_frame = ft_calloc(WINDOW_HEIGHT + 1, (sizeof (t_vec *)));
 	int i = -1;
-	while (++i < WINDOW_HEIGHT)
+	while (++i < WINDOW_HEIGHT + 1)
 		rt.last_frame[i] = ft_calloc(WINDOW_WIDTH + 1, sizeof(t_vec));
 	first_frame(&rt);
 	mlx_loop(rt.mlx);
